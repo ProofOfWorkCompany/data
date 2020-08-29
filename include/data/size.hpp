@@ -49,7 +49,7 @@ namespace data {
             }
         };
         
-        template <interface::has_size_method X> struct size<X> {
+        template <interface::has_infinite_size_method X> struct size<X> {
             cardinality operator()(const X& x) {
                 return x.size();
             }

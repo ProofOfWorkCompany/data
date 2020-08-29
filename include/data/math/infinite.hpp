@@ -23,6 +23,11 @@ namespace data::math {
             return {0, 1};
         }
         
+        auto operator<=>(const X& x) -> decltype(Value<=>x) {
+            if (is_infinite()) return 1;
+            return Value<=>x;
+        }
+        
         unsigned_limit operator+(const X& x) {
             if (is_infinite()) return infinity();
             return {Value + x};
