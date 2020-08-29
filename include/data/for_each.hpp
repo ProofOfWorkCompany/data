@@ -25,8 +25,8 @@ namespace data::meta::functional {
     // so we can always form a list::for_each
     // type using a linked list as the return type. 
     /*template <typename function, typename input> 
-    struct for_each_list : interface::sequence<input> {
-        using input_element = typename interface::sequence<input>::element;
+    struct for_each_list : sequence<input> {
+        using input_element = typename sequence<input>::element;
         using output_element = typename std::invoke_result<function, input_element>::type;
         using output = functional::stack::linked<output_element>;
         
@@ -48,7 +48,7 @@ namespace data::meta::functional {
     
     template <typename function, typename input, typename proof = interface::list<input>> 
     struct for_each_queue  {
-        using input_element = typename interface::sequence<input>::element;
+        using input_element = decltype(std::declval<input>().first());
         using output_element = typename std::invoke_result<function, input_element>::type;
         using output = tool::functional_queue<tool::linked_stack<output_element>>;
         
