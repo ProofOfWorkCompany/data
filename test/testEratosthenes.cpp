@@ -13,7 +13,7 @@ TEST(EratosthenesTest, First100Primes) {
     const data::uint32 max_primes = 100;
     
     list<N> primes = for_each(
-        [](const prime p)->N{
+        [](const prime p) -> N {
             return p.Prime;
         }, 
     Eratosthenes{N{max_primes}}.Primes);
