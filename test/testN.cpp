@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <data/data.hpp>
-#include "gtest/gtest.h"
 #include <iostream>
+#include "gtest/gtest.h"
+#include <data/data.hpp>
 
 namespace data {
     

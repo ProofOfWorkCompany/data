@@ -6,19 +6,13 @@
 #include <initializer_list>
 
 namespace milewski::okasaki {
-    template<class T>
+    template<class T, class Item>
     // requires Ord<T>
     struct OrdList
     {
-        struct Item
-        {
-            Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
-            T _val;
-            std::shared_ptr<const Item> _next;
-        };
         friend Item;
         explicit OrdList(std::shared_ptr<const Item> const & items) : _head(items) {}
-        
+
         // Empty list
         OrdList() : _head{nullptr} {}
         // Cons
@@ -43,12 +37,12 @@ namespace milewski::okasaki {
             if (isEmpty() || v <= front())
                 return OrdList(v, OrdList(_head));
             else {
-                return OrdList<T>(front(), popped_front().inserted(v));
+                return OrdList<T, Item>(front(), popped_front().inserted(v));
             }
         }
         // For debugging
         int headCount() const { return _head.use_count(); }
-        
+
         std::shared_ptr<const Item> _head;
         
         bool operator==(const OrdList o) const { return _head == o._head; }
@@ -57,18 +51,6 @@ namespace milewski::okasaki {
     };
 
 
-    template<class T>
-    OrdList<T> merged(OrdList<T> const & a, OrdList<T> const & b)
-    {
-        if (a.isEmpty())
-            return b;
-        if (b.isEmpty())
-            return a;
-        if (a.front() <= b.front())
-            return OrdList<T>(a.front(), merged(a.popped_front(), b));
-        else
-            return OrdList<T>(b.front(), merged(a, b.popped_front()));
-    }
 }
 
 #endif

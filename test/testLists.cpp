@@ -8,7 +8,7 @@
 // test whether data structures satisfy the correct interfaces. 
 namespace data {
     
-    TEST(FunctionalInterfaceTest, TestSequence) {
+    TEST(ListsTest, TestOrderedListInterfaces) {
         
         is_sequence<ordered_list<int>>();
         is_sequence<ordered_list<int*>>();
@@ -18,18 +18,6 @@ namespace data {
         is_sequence<ordered_list<const int*>>();
         is_sequence<ordered_list<const int&>>();
         
-        is_sequence<priority_queue<int>>();
-        is_sequence<priority_queue<int*>>();
-        is_sequence<priority_queue<int&>>();
-        
-        is_sequence<priority_queue<const int>>();
-        is_sequence<priority_queue<const int*>>();
-        is_sequence<priority_queue<const int&>>();
-        
-    }
-    
-    TEST(FunctionalInterfaceTest, TestContainer) {
-        
         is_container<ordered_list<int>, const int>();
         is_container<ordered_list<int*>, const int*>();
         is_container<ordered_list<int&>, const int>();
@@ -37,6 +25,26 @@ namespace data {
         is_container<ordered_list<const int>, const int>();
         is_container<ordered_list<const int*>, const int*>();
         is_container<ordered_list<const int&>, const int>();
+        
+        is_const_iterable<ordered_list<int>>();
+        is_const_iterable<ordered_list<int*>>();
+        //is_const_iterable<ordered_list<int&>>();
+        
+        is_const_iterable<ordered_list<const int>>();
+        is_const_iterable<ordered_list<const int*>>();
+        //is_const_iterable<ordered_list<const int&>>();
+        
+    }
+    
+    TEST(ListsTest, TestPriorityQueueInterfaces) {
+        
+        is_sequence<priority_queue<int>>();
+        is_sequence<priority_queue<int*>>();
+        is_sequence<priority_queue<int&>>();
+        
+        is_sequence<priority_queue<const int>>();
+        is_sequence<priority_queue<const int*>>();
+        is_sequence<priority_queue<const int&>>();
         
         is_container<priority_queue<int>, const int>();
         is_container<priority_queue<int*>, const int*>();
@@ -46,9 +54,17 @@ namespace data {
         is_container<priority_queue<const int*>, const int*>();
         is_container<priority_queue<const int&>, const int>();
         
+        is_const_iterable<priority_queue<int>>();
+        is_const_iterable<priority_queue<int*>>();
+        //is_const_iterable<priority_queue<int&>>();
+        
+        is_const_iterable<priority_queue<const int>>();
+        is_const_iterable<priority_queue<const int*>>();
+        //is_const_iterable<priority_queue<const int&>>();
+        
     }
     
-    TEST(FunctionalInterfaceTest, TestList) {
+    TEST(ListsTest, TestListInterfaces) {
         
         is_list<list<int>>();
         is_list<list<int*>>();
@@ -58,17 +74,12 @@ namespace data {
         is_list<list<const int*>>();
         is_list<list<const int&>>();
         
+        //is_iterable<list<int>, int>();
+        is_const_iterable<list<const int>>();
+        //is_iterable<list<int&>, int>();
+        is_const_iterable<list<const int&>>();
+        //is_iterable<list<int*>, int>();
+        //is_const_iterable<list<const int*>>();
     }
     
-    TEST(FunctionalInterfaceTest, TestTree) {
-        
-        is_tree<tree<int>>();
-        is_tree<tree<int*>>();
-        is_tree<tree<int&>>();
-        
-        is_tree<tree<const int>>();
-        is_tree<tree<const int*>>();
-        is_tree<tree<const int&>>();
-        
-    }
 }

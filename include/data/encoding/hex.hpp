@@ -10,7 +10,7 @@
 
 #include <boost/algorithm/hex.hpp>
 #include <data/encoding/invalid.hpp>
-#include <data/iterable.hpp>
+#include <data/cross.hpp>
 
 namespace data::encoding::hex {
     const std::string Format{"hex"};

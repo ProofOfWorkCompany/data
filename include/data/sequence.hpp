@@ -7,6 +7,7 @@
 
 #include <type_traits>
 #include <data/empty.hpp>
+#include <data/iterable.hpp>
 
 namespace data {
     
@@ -28,7 +29,7 @@ namespace data {
     concept sequence = 
         (interface::has_empty_method<L> || interface::has_size_method<L>) && 
         interface::has_rest_method<L> && 
-        interface::has_first_method<L, elem>;
+        interface::has_first_method<L, elem> && const_iterable<L, elem>;
     
     namespace meta {
         

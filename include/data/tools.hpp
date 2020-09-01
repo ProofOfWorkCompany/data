@@ -52,7 +52,7 @@ namespace data {
     template <typename X> using set = tool::map_set<map<X, tool::unit>>;
     
     // priority queue. wrapper of Milewski's implementation of Okasaki.
-    template <typename X> using priority_queue = tool::priority_queue<X, stack<X>>;
+    template <typename X> using priority_queue = tool::priority_queue<X, tree<X>, stack<X>>;
     
     // ordered_list. wrapper of Milewski's implementation of Okasaki.
     template <typename X> using ordered_list = tool::ordered_list<X>;

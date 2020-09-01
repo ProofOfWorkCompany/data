@@ -7,19 +7,15 @@
 
 #include <data/math/ring.hpp>
 
-namespace data::interface {
+namespace data::math {
     
     template <
         typename ring_elem, 
         typename group_elem,
-        typename ring_plus = data::plus<ring_elem>, 
-        typename ring_times = data::times<ring_elem>, 
-        typename group_plus = data::plus<group_elem>>
-    struct module : 
-        ring<ring_elem, ring_plus, ring_times>, 
-        group<group_plus, group_elem> {
-        // TODO
-    };
+        typename ring_plus = math::plus<ring_elem>, 
+        typename ring_times = math::times<ring_elem>, 
+        typename group_plus = math::plus<group_elem>>
+    concept module = ring<ring_elem, ring_plus, ring_times> && group<group_plus, group_elem>;
     
 }
 

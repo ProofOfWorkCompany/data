@@ -18,6 +18,13 @@ namespace data {
         is_tree<tree<const int*>>();
         is_tree<tree<const int&>>();
         
+        is_const_iterable<tree<const int>>();
+        
+        is_const_iterable<tree<const int*>>();
+        /*
+        is_iterable<tree<int&>, int>();
+        is_const_iterable<tree<const int&>>();*/
+        
     }
     
     TEST(LinkedTreeTest, TestTreeSize) {
@@ -42,8 +49,11 @@ namespace data {
         EXPECT_EQ(t3.left().size(), 1);
         
         EXPECT_EQ(t0.begin(), t0.end());
-        EXPECT_NE(t1.begin(), t1.end());
         EXPECT_EQ(*t1.begin(), 6);
+        
+        auto t1b = t1.begin();
+        auto t1e = t1.end();
+        EXPECT_NE(t1b, t1e);
         
     }
     
@@ -64,7 +74,8 @@ namespace data {
         stack<int> v3{2, 3, 4, 5};
         stack<int> v4{3, 3, 4, 7, 5, 6};
         
-        EXPECT_EQ(t1.values(), v1);
+        auto t1v = t1.values();
+        EXPECT_EQ(t1v, v1);
         EXPECT_EQ(t2.values(), v1);
         EXPECT_EQ(t3.values(), v3);
         EXPECT_EQ(t4.values(), v4);
@@ -90,5 +101,7 @@ namespace data {
         EXPECT_EQ(p.left().size(), 6);
         EXPECT_EQ(p.right().size(), 0);
     }
+    
+    // TODO test iterators and iteration
     
 }

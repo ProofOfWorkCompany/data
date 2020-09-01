@@ -68,7 +68,7 @@ namespace data::tool {
         iterator end();
         const_iterator begin() const;
         const_iterator end() const;
- 
+
         template <typename X> requires std::equality_comparable_with<elem, X>
         bool operator==(const data::tool::linked_stack<X>& x) const {
             if ((void*)(Next.get()) == (void*)(x.Next.get())) return true;

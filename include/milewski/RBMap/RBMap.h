@@ -13,7 +13,7 @@ namespace milewski::okasaki {
     // number of black nodes.
 
     template<class K, class V>
-    class RBMap
+    struct RBMap
     {
         struct Node
         {
@@ -21,12 +21,11 @@ namespace milewski::okasaki {
                 std::shared_ptr<const Node> const & lft,
                 const K key, V val,
                 std::shared_ptr<const Node> const & rgt)
-                : _c(c), _lft(lft), _key(key), _val(val), _rgt(rgt)
+                : _c(c), _lft(lft), _entry(key, val), _rgt(rgt)
             {}
             Color _c;
             std::shared_ptr<const Node> _lft;
-            const K _key;
-            const V _val;
+            data::entry<K, V> _entry;
             std::shared_ptr<const Node> _rgt;
         };
         explicit RBMap(std::shared_ptr<const Node> const & node) : _root(node) {}
@@ -35,8 +34,10 @@ namespace milewski::okasaki {
             assert(!isEmpty());
             return _root->_c;
         }
+
     public:
         RBMap() : _root{nullptr} {}
+
         RBMap(Color c, RBMap const & lft, const K& key, const V& val, RBMap const & rgt)
             : _root(std::make_shared<const Node>(c, lft._root, key, val, rgt._root))
         {
@@ -47,12 +48,16 @@ namespace milewski::okasaki {
         const K& rootKey() const
         {
             assert(!isEmpty());
-            return _root->_key;
+            return _root->_entry.Key;
         }
         const V& rootValue() const
         {
             assert(!isEmpty());
-            return _root->_val;
+            return _root->_entry.Value;
+        }
+        const data::entry<K, V>& rootEntry() const {
+            assert(!isEmpty());
+            return _root->_entry;
         }
         RBMap left() const
         {
@@ -241,7 +246,7 @@ namespace milewski::okasaki {
     void forEach(RBMap<K, V> const & t, F f) {
         if (!t.isEmpty()) {
             forEach(t.left(), f);
-            f(t.rootKey(), t.rootValue());
+            f(t.rootEntry());
             forEach(t.right(), f);
         }
     }

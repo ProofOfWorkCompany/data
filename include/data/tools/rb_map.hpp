@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DATA_MAP_RB
-#define DATA_MAP_RB
+#ifndef DATA_TOOLS_RB_MAP
+#define DATA_TOOLS_RB_MAP
 
 #include <data/tools/ordered_list.hpp>
 #include <data/functional/map.hpp>
@@ -101,8 +101,8 @@ namespace data::tool {
     template <typename K, typename V>
     const ordered_list<entry<K, V>> rb_map<K, V>::values() const {
         linked_stack<entry> kk{};
-        milewski::okasaki::forEach(Map, [&kk](const K& k, V v) -> void {
-            kk = kk << entry{k, v};
+        milewski::okasaki::forEach(Map, [&kk](const entry& e) -> void {
+            kk = kk << e;
         });
         ordered_list<entry> x{};
         for (const auto& e : data::reverse(kk)) x = x << e;
@@ -144,7 +144,7 @@ namespace data::tool {
     template <typename K, typename V>
     inline rb_map<K, V> rb_map<K, V>::remove(const K& k) const {
         rb_map m{};
-        for (auto x = begin(); x != end(); ++x) if ((*x).Key != k) m = m.insert(*x);
+        for (auto x : *this) if (x.Key != k) m = m.insert(x);
         return m;
     }
     

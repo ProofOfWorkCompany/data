@@ -14,7 +14,7 @@ namespace data::tool {
     // it is built out of any stack. 
     template <typename stack, 
         typename element = std::remove_reference_t<decltype(std::declval<stack>().first())>>
-    requires functional::stack<stack, element> 
+    requires functional::stack<stack, element> && const_iterable<stack, element>
     struct functional_queue {
         
         functional_queue();
@@ -55,13 +55,13 @@ namespace data::tool {
         template <typename A, typename ... M>
         static functional_queue make(const A x, M... m);
         
-        using const_iterator = typename stack::const_iterator;
+        using const_iterator = stack::const_iterator;
         
-        const const_iterator begin() const {
+        const_iterator begin() const {
             return values().begin();
         }
         
-        const const_iterator end() const {
+        const_iterator end() const {
             return values().end();
         }
         

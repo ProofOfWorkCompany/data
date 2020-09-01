@@ -63,6 +63,49 @@ namespace data::functional {
         tree_node(const value& v, tree l, tree r) : Value{v}, Left{l}, Right{r} {}
     };
     
+    template <typename tree, typename value>
+    class tree_iterator {
+        tool::linked_stack<tree> Branches;
+        tree Current;
+        size_t Index;
+    
+        tree_iterator(tool::linked_stack<tree> b, tree c, size_t i) : Branches{b}, Current{c}, Index{i} {}
+    public:
+        tree_iterator(size_t size) : Branches{}, Current{}, Index{size} {}
+        tree_iterator(tree t) : Branches{}, Current{t}, Index{0} {}
+        tree_iterator() : Branches{}, Current{}, Index{0} {}
+        
+        value& operator*() const;
+        
+        tree_iterator& operator++();
+        tree_iterator operator++(int);
+        
+        bool operator==(const tree_iterator&) const;
+        
+        int operator-(const tree_iterator& i) const;
+    };
+    
+}
+
+namespace std {
+    
+    template <typename tree, typename elem> 
+    struct iterator_traits<data::functional::tree_iterator<tree, elem>> {
+        using value_type = remove_const_t<elem>;
+        using difference_type = int;
+        using pointer = remove_reference_t<elem>*;
+        using reference = elem&;
+        using iterator_concept = input_output_iterator_tag;
+    };
+    
+    template <typename tree, typename elem> 
+    struct iterator_traits<data::functional::tree_iterator<tree, const elem>> {
+        using value_type = remove_const_t<elem>;
+        using difference_type = int;
+        using pointer = const remove_reference_t<elem>*;
+        using reference = const elem&;
+        using iterator_concept = input_iterator_tag;
+    };
 }
 
 namespace data {
@@ -92,6 +135,43 @@ namespace data {
         return x.right();
     }
 
+}
+
+namespace data::functional {
+    
+    template <typename tree, typename value>
+    inline value& tree_iterator<tree, value>::operator*() const {
+        return Current.root();
+    }
+    
+    template <typename tree, typename value>
+    inline bool tree_iterator<tree, value>::operator==(const tree_iterator& i) const {
+        return Current == i.Current && Branches == i.Branches && Index == i.Index;
+    }
+    
+    template <typename tree, typename value>
+    tree_iterator<tree, value>& tree_iterator<tree, value>::operator++() {
+        if (Current.size() == 0) *this = tree_iterator{Index};
+        if (Current.left().size() != 0) {
+            if (Current.right().size() != 0) *this = tree_iterator{Branches << Current.right(), Current.left(), Index + 1};
+            else *this = tree_iterator{Branches, Current.left(), Index + 1};
+        } else if (Current.right().size() != 0) *this = tree_iterator{Branches, Current.right(), Index + 1};
+        else if (Branches.size() != 0) *this = tree_iterator{Branches.rest(), Branches.first(), Index + 1};
+        else *this = tree_iterator{Index + 1};
+        return *this;
+    }
+    
+    template <typename tree, typename value>
+    inline tree_iterator<tree, value> tree_iterator<tree, value>::operator++(int) { // Postfix
+        tree_iterator n = *this;
+        operator++();
+        return n;
+    }
+    
+    template <typename tree, typename value>
+    inline int tree_iterator<tree, value>::operator-(const tree_iterator& i) const {
+        return static_cast<int>(Index) - i.Index;
+    }
 }
 
 #endif

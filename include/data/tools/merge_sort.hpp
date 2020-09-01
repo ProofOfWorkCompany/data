@@ -5,7 +5,8 @@
 #ifndef DATA_TOOLS_MERGE_SORT
 #define DATA_TOOLS_MERGE_SORT
 
-#include <data/list/linked.hpp>
+#include <data/tools/linked_stack.hpp>
+#include <data/tools/ordered_list.hpp>
 
 namespace data::sort {
     

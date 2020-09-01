@@ -187,16 +187,7 @@ namespace data {
 }
 
 // Geometry
-#include <data/math/point.hpp>
-
-namespace data {
-    
-    template <typename X, size_t size>
-    using point = data::math::point<X, size>;
-    
-    template <typename X, size_t size>
-    using vector = data::math::vector<X, size>;
-}
+#include <data/point.hpp>
 
 namespace data::math::number {
     constexpr auto zero = decimal{"0"};

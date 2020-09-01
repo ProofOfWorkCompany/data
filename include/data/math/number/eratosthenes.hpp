@@ -21,8 +21,24 @@ namespace data::math::number {
             N Prime;
             N Multiple;
             
+            bool operator==(const entry& e) const {
+                return Multiple == e.Multiple;
+            }
+            
             bool operator<=(const entry& e) const {
                 return Multiple <= e.Multiple;
+            }
+            
+            bool operator>=(const entry& e) const {
+                return Multiple >= e.Multiple;
+            }
+            
+            bool operator<(const entry& e) const {
+                return Multiple < e.Multiple;
+            }
+            
+            bool operator>(const entry& e) const {
+                return Multiple > e.Multiple;
             }
             
             entry increment() const {
@@ -30,7 +46,7 @@ namespace data::math::number {
             }
         };
         
-        using heap = tool::priority_queue<entry, stack<entry>>;
+        using heap = priority_queue<entry>;
         heap Sieve;
         
         eratosthenes(list<prime<N>> p, N m, heap sieve) : Primes{p}, Next{m}, Sieve{sieve} {}

@@ -6,6 +6,36 @@
 #include "gtest/gtest.h"
 
 namespace data {
+    
+    // test whether these data structures satisfy the correct interfaces. 
+    TEST(LinkedStackTest, TestStackInterfaces) {
+        
+        is_stack<stack<int>>();
+        is_stack<stack<int*>>();
+        is_stack<stack<int&>>();
+        
+        is_stack<stack<const int>>();
+        is_stack<stack<const int*>>();
+        is_stack<stack<const int&>>();
+        
+        is_input_iterator<functional::stack_iterator<stack<int>, const int>>();
+        is_output_iterator<functional::stack_iterator<stack<int>, int>, int>();
+        is_input_iterator<functional::stack_iterator<stack<const int>, const int>>();
+        is_input_iterator<functional::stack_iterator<stack<int&>, const int>>();
+        is_output_iterator<functional::stack_iterator<stack<int&>, int>, int>();
+        is_input_iterator<functional::stack_iterator<stack<const int&>, const int>>();
+        is_input_iterator<functional::stack_iterator<stack<int*>, const int*>>();
+        is_input_iterator<functional::stack_iterator<stack<const int*>, const int*>>();
+        
+        // TODO these lines should be uncommented and work. 
+        //is_iterable<list<int>, int>();
+        is_const_iterable<const stack<const int>>();
+        //is_iterable<list<int&>, int>();
+        is_const_iterable<const stack<const int&>>();
+        //is_iterable<list<int*>, int>();
+        is_const_iterable<list<const int*>>();
+        
+    }
 
     TEST(LinkedStackTest, TestLinkedStack1) {
         
