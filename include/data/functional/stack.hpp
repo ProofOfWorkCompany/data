@@ -41,7 +41,7 @@ namespace data::functional {
     concept stack = sequence<const L, elem> && interface::has_prepend_method<const L, elem> && 
         interface::has_stack_constructor<L, elem> && std::default_initializable<L>;
 
-    template <stack L> 
+    template <sequence L> 
     std::ostream& write(std::ostream& o, L n) {
         o << string{"{"};
         if (!data::empty(n)) {
