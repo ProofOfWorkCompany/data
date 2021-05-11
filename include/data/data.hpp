@@ -21,6 +21,9 @@
 #include <data/fold.hpp>
 #include <data/for_each.hpp>
 
+// cryptography 
+#include <data/crypto/hash/hash.hpp>
+
 // Thread safe communication channel, similar to golang. 
 #include <data/tools/channel.hpp>
 

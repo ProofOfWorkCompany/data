@@ -7,7 +7,7 @@
 
 #include <data/iterable.hpp>
 #include <data/stream.hpp>
-#include <data/crypto/sha256.hpp>
+#include <data/crypto/hash/functions.hpp>
 
 namespace data::crypto {
     
@@ -109,7 +109,8 @@ namespace data::crypto {
     };
     
     // A key retriever that prints a message to the user and then reads a passphrase. 
-    struct user_passphrase : retriever<32> {
+    template<hash::writer W, size_t size> requires std::same_as<decltype(std::declval<W>().finalize()), digest<size>>
+    struct user_passphrase : retriever<size> {
         std::string UserMessage;
         std::ostream& Cout;
         std::istream& Cin;
@@ -117,12 +118,12 @@ namespace data::crypto {
         user_passphrase(std::string user_message, std::ostream& out, std::istream& in) : 
             UserMessage {user_message}, Cout{out}, Cin{in} {}
         
-        symmetric_key<32> retrieve() override {
+        symmetric_key<size> retrieve() override {
             Cout << UserMessage;
             std::string line;
             std::getline(Cin, line);
-            symmetric_key<32> x;
-            auto d = sha256::hash(line);
+            symmetric_key<size> x;
+            auto d = W{}(line);
             std::copy(d.begin(), d.end(), x.begin());
             return x;
         }

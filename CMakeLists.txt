@@ -111,9 +111,7 @@ if(PACKAGE_TESTS)
     enable_testing()
     add_subdirectory(test)
 
-
 endif()
-
 
 #  Add Library source files here
 
@@ -146,7 +144,7 @@ ADD_LIBRARY(data STATIC
     src/data/math/number/gmp/N.cpp
     src/data/math/number/gmp/aks.cpp
     src/data/math/number/gmp/sqrt.cpp
-    src/data/crypto/AES.cpp
+    #src/data/crypto/AES.cpp
     src/data/tools/circular_queue.cpp
     src/data/tools/rate_limiter.cpp
     src/data/log/log.cpp
