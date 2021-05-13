@@ -13,7 +13,7 @@
 #include <data/encoding/digits.hpp>
 #include <data/encoding/invalid.hpp>
 #include <data/math/division.hpp>
-#include <data/iterable.hpp>
+#include <data/cross.hpp>
 
 namespace data::encoding::base58 {
     
@@ -31,7 +31,7 @@ namespace data::encoding::base58 {
         return c < '1' ? -1 : c <= '9' ?  c - '1' : c < 'A' ? -1 : c <= 'H' ? c - 'A' + 9 : c < 'J' ? -1 : c <= 'N' ? c - 'J' + 17 : c < 'P' ? -1 : c <= 'Z' ? c - 'P' + 22 : c < 'a' ? -1 : c <= 'k' ? c - 'a' + 33 : c < 'm' ? -1 : c <= 'z' ? c - 'm' + 44 : -1;
     };
     
-    template <typename N>
+    template <math::natural N>
     N read(const string_view s) {
         if (s.size() == 0) return N{};
         
@@ -66,7 +66,7 @@ namespace data::encoding::base58 {
         view(string_view);
     };
     
-    struct string : std::string {
+    struct string final : std::string {
         string();
         string(const std::string&);
         string(uint64);
@@ -103,7 +103,7 @@ namespace data::encoding::base58 {
         math::division<string, uint64> divide(uint64) const;
     };
     
-    template <typename N>
+    template <math::natural N>
     string write(N n) {
         return encoding::write_base<N>(n, characters());
     };

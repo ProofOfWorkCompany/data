@@ -12,8 +12,7 @@ namespace data::tool {
     
     // functional queue based on Milewski's implementation of Okasaki. 
     // it is built out of any stack. 
-    template <typename stack, 
-        typename element = std::remove_reference_t<decltype(std::declval<stack>().first())>>
+    template <typename stack, typename element = std::remove_reference_t<decltype(std::declval<stack>().first())>>
     requires functional::stack<stack, element> && const_iterable<stack, element>
     struct functional_queue {
         

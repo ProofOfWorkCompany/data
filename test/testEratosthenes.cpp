@@ -5,7 +5,6 @@
 #include "data/math/number/eratosthenes.hpp"
 #include "data/data.hpp"
 #include "gtest/gtest.h"
-#include <iostream>
 
 TEST(EratosthenesTest, First100Primes) {
     using namespace data;

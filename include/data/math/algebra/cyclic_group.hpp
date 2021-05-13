@@ -9,8 +9,7 @@
 
 #include <data/math/number/modular.hpp>
 #include <data/math/group.hpp>
-#include <data/math/commutative.hpp>
-#include <data/math/associative.hpp>
+#include <data/math/arithmetic.hpp>
 
 namespace data::math::algebra {
     

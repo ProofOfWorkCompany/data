@@ -5,21 +5,63 @@
 #ifndef DATA_MATH_CAYLEY_DICKSON
 #define DATA_MATH_CAYLEY_DICKSON
 
-#include <data/math/nonnegative.hpp>
-#include <data/math/commutative.hpp>
-#include <data/math/associative.hpp>
 #include <data/math/field.hpp>
+#include <data/math/abs.hpp>
 
 namespace data::math {
     
-    template <typename X> struct conjugate;
+    template <typename X> struct re;
     
-    template <typename R, typename X> struct quadrance;
+    template <typename X> struct im;
+}
+
+namespace data {
+
+    template <typename X> 
+    inline auto re(const X& x) -> decltype(math::re<X>{}()) {
+        return math::re<X>{}(x);
+    }
+
+    template <typename X> 
+    inline auto im(const X& x) -> decltype(math::re<X>{}()) {
+        return math::im<X>{}(x);
+    }
+
+}
+namespace data::interface {
     
-    template <typename R, typename X> struct re;
+    template <typename X>
+    concept has_re_method = requires(X x) {
+        { x.re() };
+    };
+    
+    template <typename X>
+    concept has_im_method = requires(X x) {
+        { x.im() };
+    };
+}
+
+namespace data::math {
+    
+    template <typename X> 
+    requires interface::has_re_method<X>
+    struct re<X> {
+        auto operator()(const X& x) -> decltype(x.re()) {
+            return x.re();
+        }
+    };
+    
+    template <typename X>
+    requires interface::has_im_method<X>
+    struct im<X> {
+        auto operator()(const X& x) -> decltype(x.im()) {
+            return x.im();
+        }
+    };
     
     template <typename nda, typename q>
-    struct cayley_dickson : interface::ordered<q>, interface::field<q> {
+    requires ordered<q> && field<q>
+    struct cayley_dickson {
         // TODO use proper interfaces: 
         //   nda is a normed division algebra. 
         
@@ -72,22 +114,9 @@ namespace data::math {
         }
     };
     
-    template <typename nda, typename q> struct conjugate<cayley_dickson<nda, q>> {
-        cayley_dickson<nda, q> operator()(const cayley_dickson<nda, q>& x) {
-            return x.conjugate();
-        }
-    };
-    
-    template <typename nda, typename q> struct quadrance<q, cayley_dickson<nda, q>> {
-        nonnegative<q> operator()(const cayley_dickson<nda, q>& x) {
-            return x.quadrance();
-        }
-    };
-    
-    template <typename nda, typename q> struct re<q, cayley_dickson<nda, q>> {
-        q operator()(const cayley_dickson<nda, q>& x) {
-            return x.re();
-        }
+    template <typename nda, typename q> struct normed<cayley_dickson<nda, q>> {
+        using quad_type = nonnegative<q>;
+        using norm_type = nonnegative<q>;
     };
     
 }

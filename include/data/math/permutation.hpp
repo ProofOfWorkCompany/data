@@ -8,7 +8,6 @@
 #include <data/tools.hpp>
 
 #include <data/math/arithmetic.hpp>
-#include <data/math/associative.hpp>
 
 namespace data::math {
 

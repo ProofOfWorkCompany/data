@@ -5,11 +5,12 @@
 #ifndef DATA_MATH_NUMBER_GMP_Z
 #define DATA_MATH_NUMBER_GMP_Z
 
-#include <data/math/number/gmp/mpz.hpp>
-#include <data/math/number/integer.hpp>
 #include <data/iterable.hpp>
+#include <data/math/number/integer.hpp>
+#include <data/math/number/rational.hpp>
+#include <data/math/number/gmp/mpz.hpp>
 #include <data/io/unimplemented.hpp>
-#include <iostream>
+#include <gmp/gmpxx.h>
 
 namespace data::math::number::gmp {
     
@@ -320,7 +321,7 @@ namespace data::math::number::gmp {
             return *this;
         }
         
-        Z abs() const;
+        N abs() const;
         
         Z arg() const {
             if (sign() == math::zero) throw division_by_zero{};
@@ -365,32 +366,45 @@ namespace data::math::number::gmp {
         
         friend struct N;
     };
-    
-    inline Z Z::abs() const {
-        Z n;
-        __gmp_abs_function::eval(n.MPZ, MPZ);
-        return n;
-    }
 
     std::ostream& operator<<(std::ostream& o, const data::math::number::gmp::Z& n);
 
 }
 
 namespace data::math {
-    template <> struct commutative<data::plus<math::number::gmp::Z>, math::number::gmp::Z> {};
-    template <> struct associative<data::plus<math::number::gmp::Z>, math::number::gmp::Z> {};
-    template <> struct commutative<data::times<math::number::gmp::Z>, math::number::gmp::Z> {};
-    template <> struct associative<data::times<math::number::gmp::Z>, math::number::gmp::Z> {};
     
-    template <> struct identity<data::plus<math::number::gmp::Z>, math::number::gmp::Z> {
-        static const math::number::gmp::Z value() {
+    template <> struct commutative<plus<number::gmp::Z>, number::gmp::Z> {};
+    template <> struct associative<plus<number::gmp::Z>, number::gmp::Z> {};
+    template <> struct commutative<times<number::gmp::Z>, number::gmp::Z> {};
+    template <> struct associative<times<number::gmp::Z>, number::gmp::Z> {};
+    
+    template <> struct identity<plus<number::gmp::Z>, number::gmp::Z> {
+        number::gmp::Z operator()() const {
             return 0;
         }
     };
     
-    template <> struct identity<data::times<math::number::gmp::Z>, math::number::gmp::Z> {
-        static const math::number::gmp::Z value() {
+    template <> struct identity<times<number::gmp::Z>, number::gmp::Z> {
+        number::gmp::Z operator()() const {
             return 1;
+        }
+    };
+    
+    template <> struct inverse<number::gmp::Z, plus<number::gmp::Z>, number::gmp::Z> {
+        number::gmp::Z invert(const number::gmp::Z &a, plus<number::gmp::Z>, const number::gmp::Z &b) const {
+            return a - b;
+        }
+    };
+    
+    template <> struct normed<number::gmp::Z> {
+        using quad_type = number::gmp::N;
+        using norm_type = number::gmp::N;
+    };
+    
+    template <> struct arg<number::gmp::Z, number::gmp::Z> {
+        number::gmp::Z operator()(const number::gmp::Z &z) const {
+            auto x = z.sign();
+            return x == 0 ? number::gmp::Z{0} : x == positive ? number::gmp::Z{1} : number::gmp::Z{-1};
         }
     };
 }

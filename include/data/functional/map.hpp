@@ -85,11 +85,12 @@ namespace data {
             typename value = decltype(std::declval<X>().values().first().value())>
         concept map = container<const X, key> && 
             indexed<const X, key, value> &&
-            ordered_set<const X, const entry<key, value>> &&
+            set<const X, const entry<key, value>> &&
             interface::has_insert_key_value<const X, key, value> && 
             interface::has_insert_method<X, const entry<key, value>> && 
             interface::has_keys_method<const X, key> && 
             interface::has_remove_method<const X, const key> && 
+            interface::has_values_method<const X, entry<key, value>> &&
             std::default_initializable<X>;
 
         template <map M> 

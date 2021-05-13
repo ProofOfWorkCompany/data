@@ -14,8 +14,7 @@
 namespace data {
     
     // The cartesian product. 
-    // it is the same as a vector except that it can be
-    // automatically cast to view. 
+    // it is the same as a vector with some slight improvements. 
     template <typename X> struct cross : std::vector<X> {
         cross();
         cross(size_t size);
@@ -25,8 +24,6 @@ namespace data {
         
         template<sequence list>
         explicit cross(list l);
-        
-        cross(view<X> b);
         
         bool valid() const {
             for (const X& x : *this) if (!data::valid(x)) return false;
@@ -74,7 +71,7 @@ namespace data {
         operator bytes_view() const {
             return bytes_view(cross<byte>::data(), cross<byte>::size());
         }
-        bytes(string_view x) : cross<byte>(x.size()) {
+        bytes(bytes_view x) : cross<byte>(x.size()) {
             std::copy(x.begin(), x.end(), cross<byte>::begin());
         }
     };
@@ -107,8 +104,6 @@ namespace data {
         
         section(size_t s, X fill) : section(std::make_shared<cross<X>>(s, fill)) {}
         
-        section(view<X> v) : section(std::make_shared<cross<X>>(v)) {}
-        
     private:
         section(ptr<cross<X>> d, slice<X> s) : slice<X>(s), Data(d) {}
         section(ptr<cross<X>> d, range r) : slice<X>(d->range(r)), Data(d) {}
@@ -128,16 +123,6 @@ namespace data {
             section(d, d == nullptr || d.size() - begin < size ? 
                 slice<X, size>() : 
                 slice<X, size>(d->data())) {}
-        
-        section(view<X> d, size_t begin) : 
-            section(d.size() - begin < size ? 
-                section() :
-                section(std::make_shared<cross<X>>(d), begin)) {}
-        
-        section(view<X> d, size_t begin, size_t end) : 
-            section(end - begin != size ? 
-                section() :
-                section(std::make_shared<cross<X>>(d), begin)) {}
         
         section(const slice<X, size>);
         
@@ -228,11 +213,6 @@ namespace data {
             *b = l.first();
             l = l.rest();
         }
-    }
-        
-    template <typename X>
-    inline cross<X>::cross(view<X> b) : std::vector<X>(b.size()) {
-        std::copy(b.begin(), b.end(), std::vector<X>::begin());
     }
         
     template <typename X>

@@ -9,8 +9,6 @@
 
 namespace data::math {
     
-    template <typename R, typename X> struct im;
-    
     template <typename R>
     struct complex : cayley_dickson<R, R> {
         
@@ -66,7 +64,7 @@ namespace data::math {
         }
     };
     
-    template <typename R> struct im<R, complex<R>> {
+    template <typename R> struct im<complex<R>> {
         R operator()(const complex<R>& x) {
             return x.im();
         }

@@ -15,7 +15,7 @@ namespace data {
         
         template <typename list, typename elem> 
         concept has_first_method = requires (list x) {
-            { x.first() } -> std::convertible_to<const elem>;
+            { x.first() } -> std::convertible_to<const elem&>;
         };
         
         template <typename list> 
@@ -29,7 +29,7 @@ namespace data {
     concept sequence = 
         (interface::has_empty_method<L> || interface::has_size_method<L>) && 
         interface::has_rest_method<L> && 
-        interface::has_first_method<L, elem> && const_iterable<L, elem>;
+        interface::has_first_method<L, elem>;
     
     namespace meta {
         

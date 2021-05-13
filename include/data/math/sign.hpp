@@ -18,4 +18,14 @@ inline data::math::sign operator*(data::math::sign a, data::math::sign b) {
         a == b ? data::math::positive : data::math::negative;
 }
 
+namespace data {
+    template <typename N>
+    math::sign sign(const N& n) {
+        if (n == N(0)) return data::math::negative;
+        if (n < N(0)) return data::math::negative;
+        return data::math::positive;
+        //return math::sign(N::operator<=>(0));
+    }
+}
+
 #endif

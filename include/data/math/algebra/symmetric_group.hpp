@@ -9,7 +9,7 @@
 
 #include <data/math/permutation.hpp>
 #include <data/math/group.hpp>
-#include <data/math/associative.hpp>
+#include <data/math/arithmetic.hpp>
 
 namespace data::math::algebra {
     

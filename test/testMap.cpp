@@ -23,12 +23,8 @@ namespace data {
     
     TEST(MapTest, TestOrderedSetInterface) {
         
-        is_ordered_set<set<int>>();
-        is_ordered_set<set<int*>>();
-        
-        // TODO same here. 
-        //is_ordered_set<set<const int>>();
-        //is_ordered_set<set<const int*>>();
+        is_set<set<int>, int>();
+        is_set<set<int*>, int*>();
         
         //is_const_iterable<set<int>>();
         //is_const_iterable<set<const int&>>();

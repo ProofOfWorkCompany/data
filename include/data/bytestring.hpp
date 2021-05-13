@@ -16,7 +16,10 @@ namespace data {
         using oriented<byte, r, sizes...>::oriented;
         
         bytestring(string_view hexidecimal);
-        bytestring(bytes_view v) : oriented<byte, r, sizes...>(v) {}
+        bytestring(bytes_view v) {
+            section<byte, sizes...>::Data->resize(v.size());
+            std::copy(v.begin(), v.end(), oriented<byte, r, sizes...>::begin());
+        }
         
         bytestring operator~() const;
         

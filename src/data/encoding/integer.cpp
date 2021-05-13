@@ -5,7 +5,7 @@
 #include <data/encoding/integer.hpp>
 #include <data/encoding/hex.hpp>
 #include <data/encoding/digits.hpp>
-#include <data/math/number/gmp/gmp.hpp>
+#include <data/math/number/gmp/N.hpp>
 #include <data/math/number/bytes/N.hpp>
 #include <data/math/number/bytes/Z.hpp>
 #include <data/io/unimplemented.hpp>
@@ -17,7 +17,7 @@ namespace data::encoding {
         
         ptr<bytes> read(string_view s, endian::order r) {
             if (!valid(s)) return nullptr;
-            math::number::N_bytes<endian::big> n{math::number::N{s}};
+            math::number::N_bytes<endian::big> n{math::number::gmp::N{s}};
             if (r == endian::little) std::reverse(n.begin(), n.end());
             return std::make_shared<bytes>(static_cast<bytes>(n));
         }
@@ -33,7 +33,7 @@ namespace data::encoding {
             return write_base<N>(n, Characters);
         }
         
-        using nat = math::number::N;
+        using nat = math::number::gmp::N;
         
         N::N(uint64 x) : string{write_decimal(nat{x})} {}
         
@@ -163,7 +163,7 @@ namespace data::encoding {
             return std::string{"0x"} + p;
         }
         
-        using nat = math::number::N;
+        using nat = math::number::gmp::N;
         
         N::N(uint64 x) : string{write_hexidecimal(nat{x})} {}
         
@@ -289,7 +289,7 @@ namespace data::encoding {
             if (hexidecimal::valid(s)) return hexidecimal::read(s, r);
             if (negative(s)) {
                 //std::cout << "reading in negative decimal integer string \"" << s << "\"" << std::endl;
-                math::number::Z z{s};
+                math::number::gmp::Z z{s};
                 //std::cout << "reading in Z " << z << std::endl;
                 math::number::Z_bytes<endian::little> n{z};
                 //std::cout << "reading in Z_bytes " << n << std::endl;

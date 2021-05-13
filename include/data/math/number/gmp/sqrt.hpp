@@ -7,26 +7,43 @@
 
 #include <data/math/number/gmp/N.hpp>
 #include <data/math/number/sqrt.hpp>
+#include <data/math/complex.hpp>
 
 namespace data::math::number::gmp {
         
     N sqrt(const N& n);
     N root(const N& n, uint32 p);
+    
+    N inline N::sqrt() const {
+        return gmp::sqrt(*this);
+    }
+        
+    N inline sqrt(const N& n) {
+        return root(n, 2);
+    }
 
 }
 
-namespace data::math::number {
-        
-    template <> struct sqrt<gmp::N, gmp::N> {
-        gmp::N operator()(const gmp::N& n) {
-            return gmp::sqrt(n);
+namespace data::math {
+    
+    template <> struct sqrt<number::gmp::N, number::gmp::N> {
+        number::gmp::N operator()(const number::gmp::N &n) const {
+            return n.sqrt();
         }
     };
-        
-    template <> struct sqrt<gmp::N, gmp::Z> {
-        gmp::N operator()(const gmp::Z& z) {
-            if (z < 0) return gmp::N{};
-            return gmp::sqrt(gmp::N{z});
+    
+    template <> struct sqrt<number::gmp::N, number::gmp::Z> {
+        number::gmp::N operator()(const number::gmp::Z &n) const {
+            if (n < 0) return number::gmp::N{};
+            return sqrt<number::gmp::N, number::gmp::N>{}(number::gmp::N{n});
+        }
+    };
+    
+    template <> struct sqrt<number::gmp::Z, number::gmp::Z> {
+        number::gmp::Z operator()(const number::gmp::Z &z) const {
+            number::gmp::N n = sqrt<number::gmp::N, number::gmp::Z>{}(z);
+            if (n.valid()) return number::gmp::N{};
+            return number::gmp::Z(n);
         }
     };
 

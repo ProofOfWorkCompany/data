@@ -5,8 +5,10 @@
 #ifndef DATA_ENDIAN
 #define DATA_ENDIAN
 
-#include <data/types.hpp>
+#include <boost/endian/arithmetic.hpp>
 #include <boost/endian/conversion.hpp>
+
+#include <data/types.hpp>
 
 namespace data::endian {
     

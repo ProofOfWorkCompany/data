@@ -84,7 +84,6 @@ namespace data::tool {
     private:
         const element& last_private() const;
         
-
         ordered_list(uint32 size, milewski::okasaki::OrdList<element, item> ordered);
     };
     

@@ -140,14 +140,15 @@ ADD_LIBRARY(data STATIC
     src/data/networking/http.cpp
     src/data/iterable.cpp
     src/data/tools/channel.cpp
+    src/data/tools/circular_queue.cpp
+    src/data/tools/rate_limiter.cpp
+    src/data/log/log.cpp
     src/data/math/number/gmp/mpq.cpp
     src/data/math/number/gmp/N.cpp
     src/data/math/number/gmp/aks.cpp
     src/data/math/number/gmp/sqrt.cpp
+    
     #src/data/crypto/AES.cpp
-    src/data/tools/circular_queue.cpp
-    src/data/tools/rate_limiter.cpp
-    src/data/log/log.cpp
 )
 
 target_include_directories(data PUBLIC include)

@@ -32,8 +32,9 @@ namespace data {
     template <functional::map X>
     void is_map() {}
 
-    template <functional::ordered_set X>
-    void is_ordered_set() {}
+    template <typename X, typename elem>
+    requires functional::set<X, elem>
+    void is_set() {}
     
     template <std::input_iterator X>
     void is_input_iterator() {}
@@ -43,5 +44,5 @@ namespace data {
     
     template <std::bidirectional_iterator X>
     void is_bidirectional_iterator() {}
-    
+
 }

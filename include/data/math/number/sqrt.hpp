@@ -5,13 +5,25 @@
 #ifndef DATA_MATH_NUMBER_SQRT
 #define DATA_MATH_NUMBER_SQRT
 
-#include <data/types.hpp>
-#include <data/math/sign.hpp>
-#include <data/math/division.hpp>
+#include <data/math/abs.hpp>
 
-namespace data::math::number {
+namespace data::math {
 
-    template <typename G, typename Z> struct sqrt;
+    template <typename G, typename Z = G> struct sqrt;
+}
+
+namespace data::interface {
+    
+    template <typename X>
+    concept has_sqrt_method = requires(const X x) {
+        { x.sqrt() };
+    };
+    
+    template <typename G, typename Z = G>
+    concept has_sqrt = requires(const Z x) {
+        { math::sqrt<G, Z>{}(x) } -> std::same_as<G>;
+    };
+    
 }
 
 #endif

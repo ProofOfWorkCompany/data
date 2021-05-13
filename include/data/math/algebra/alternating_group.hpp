@@ -9,7 +9,7 @@
 
 #include <data/math/permutation.hpp>
 #include <data/math/group.hpp>
-#include <data/math/associative.hpp>
+#include <data/math/arithmetic.hpp>
 
 namespace data::math::algebra {
     
@@ -37,27 +37,27 @@ namespace data::math::algebra {
         alternating_group(const permutation<number::modular<N, natural>>& p) : permutation<number::modular<N, natural>>{p} {}
         
     };
-    
-}
 
-template <typename N, auto & natural>
-inline std::ostream& operator<<(std::ostream& o, const data::math::algebra::alternating_group<N, natural>& m) {
-    return o << "alternating<"<<natural<<">{"<<static_cast<const data::math::permutation<data::math::number::modular<N, natural>>&>(m)<<"}";
+    template <typename N, auto & natural>
+    inline std::ostream& operator<<(std::ostream& o, const alternating_group<N, natural>& m) {
+        return o << "alternating<"<<natural<<">{"<<static_cast<const permutation<number::modular<N, natural>>&>(m)<<"}";
+    }
+    
 }
 
 namespace data::math {
     
     template <typename N, auto & natural>
     struct associative<
-        data::times<algebra::alternating_group<N, natural>>, 
+        times<algebra::alternating_group<N, natural>>, 
         algebra::alternating_group<N, natural>>
-        : associative<data::plus<N>, N> {};
+        : associative<plus<N>, N> {};
     
     template <typename N, auto & natural>
     struct identity<
-        data::times<algebra::dihedral_group<N, natural>>, 
+        times<algebra::dihedral_group<N, natural>>, 
         algebra::alternating_group<N, natural>>
-        : identity<data::times<N>, N> {
+        : identity<times<N>, N> {
         static const algebra::alternating_group<N, natural> value() {
             return {identity<data::times<N>, N>::value()};
         }

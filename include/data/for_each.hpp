@@ -34,16 +34,6 @@ namespace data {
     template <typename fun, typename input, 
         typename element = std::remove_reference_t<decltype(std::declval<input>().values().first())>, 
         typename output = std::remove_reference_t<decltype(std::declval<fun>()(std::declval<element>()))>>
-    requires function<fun, output, element> && functional::ordered_set<input, element>
-    inline set<output> for_each(const fun& f, const input& i) {
-        return fold([&f](set<output> s, element x) -> set<output> {
-            return s.insert(f(x));
-        }, set<output>{}, i.values());
-    }
-    
-    template <typename fun, typename input, 
-        typename element = std::remove_reference_t<decltype(std::declval<input>().values().first())>, 
-        typename output = std::remove_reference_t<decltype(std::declval<fun>()(std::declval<element>()))>>
     requires function<fun, output, element> && functional::tree<input, element>
     inline tree<output> for_each(const fun& f, const input& i) {
         if (empty(i)) return {};

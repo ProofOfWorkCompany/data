@@ -7,9 +7,9 @@
 
 #include <limits>
 
+#include <data/math/number/natural.hpp>
 #include <data/tools/linked_stack.hpp>
 
-#include <data/math/number/natural.hpp>
 #include <data/math/number/bytes/Z.hpp>
 #include <data/bytestring.hpp>
 
@@ -17,6 +17,8 @@ namespace data::math::number {
     
     template <endian::order r>
     struct N_bytes : protected bytestring<r> {
+        using N = gmp::N;
+        using Z = gmp::Z;
         
         N_bytes() : bytestring<r>{} {}
         
@@ -196,7 +198,7 @@ namespace data::math::number {
         }
         
         math::division<N_bytes> divide(const N_bytes& n) const {
-            return natural::divide<N_bytes>(*this, n);
+            return divide_natural<N_bytes>(*this, n);
         }
         
         bool operator|(const N_bytes& n) const {
@@ -264,7 +266,7 @@ namespace data::math::number {
             throw method::unimplemented{"N_bytes{Z_bytes}"};
         }
         
-        friend struct abs<N_bytes, Z_bytes<r>>;
+        friend struct abs<Z_bytes<r>>;
     };
     
     // Inefficient
@@ -308,21 +310,19 @@ namespace data::math::number {
     }
 }
 
-namespace data::math::number {
+namespace data::math {
+    // Declare that the plus and times operation on N are commutative. 
+    template <endian::order r> struct commutative<plus<number::N_bytes<r>>, number::N_bytes<r>> {};
+    template <endian::order r> struct associative<plus<number::N_bytes<r>>, number::N_bytes<r>> {};
+    template <endian::order r> struct commutative<times<number::N_bytes<r>>, number::N_bytes<r>> {};
+    template <endian::order r> struct associative<times<number::N_bytes<r>>, number::N_bytes<r>> {};
+    
     template <endian::order r> 
-    struct abs<N_bytes<r>, N_bytes<r>> {
-        N_bytes<r> operator()(const N_bytes<r>& i) {
+    struct abs<number::N_bytes<r>> {
+        number::N_bytes<r> operator()(const number::N_bytes<r>& i) {
             return i;
         }
     };
-}
-
-namespace data::math {
-    // Declare that the plus and times operation on N are commutative. 
-    template <endian::order r> struct commutative<data::plus<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
-    template <endian::order r> struct associative<data::plus<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
-    template <endian::order r> struct commutative<data::times<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
-    template <endian::order r> struct associative<data::times<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
 }
 
 namespace data::encoding::hexidecimal { 

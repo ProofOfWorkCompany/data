@@ -6,11 +6,10 @@
 #define DATA_MATH_NUMBER_GMP_N
 
 #include <limits>
-#include <data/math/number/natural.hpp>
-#include <data/math/number/abs.hpp>
+#include <data/math/abs.hpp>
 #include <data/math/number/sqrt.hpp>
 #include <data/math/number/gmp/Z.hpp>
-#include <data/encoding/endian.hpp>
+#include <data/math/complex.hpp>
 
 namespace data::math::number::gmp {
     
@@ -220,10 +219,7 @@ namespace data::math::number::gmp {
             return *this;
         }
         
-        static N as(const Z& z) {
-            if (z < 0) return N{0};
-            return N{z};
-        }
+        N sqrt() const;
         
         template <endian::order o>
         explicit N(const N_bytes<o>& n) : N{bytes_view(n), o} {}
@@ -239,8 +235,7 @@ namespace data::math::number::gmp {
         void write_bytes(bytes&, endian::order) const;
         
         friend struct Z;
-        friend struct number::abs<N, Z>;
-        friend struct number::sqrt<N, Z>;
+        friend struct math::sqrt<N, Z>;
         template <endian::order o> friend struct N_bytes;
     };
     
@@ -292,47 +287,50 @@ namespace data::math::number::gmp {
         return operator*=(n.Value);
     }
     
+    inline N Z::abs() const {
+        Z n;
+        __gmp_abs_function::eval(n.MPZ, MPZ);
+        return N{n};
+    }
+    
 }
 
-namespace data::math::number {
+// Declare associativity and commutivity of operators + and * on N. 
+namespace data::math {
+    
+    template <> struct commutative<plus<number::gmp::N>, number::gmp::N> {};
+    template <> struct associative<plus<number::gmp::N>, number::gmp::N> {};
+    template <> struct commutative<times<number::gmp::N>, number::gmp::N> {};
+    template <> struct associative<times<number::gmp::N>, number::gmp::N> {};
+    
+    template <> struct identity<plus<number::gmp::N>, number::gmp::N> {
+        number::gmp::N operator()() const {
+            return 1;
+        }
+    };
+    
+    template <> struct identity<times<number::gmp::N>, number::gmp::N> {
+        number::gmp::N operator()() const {
+            return 0;
+        }
+    };
+    
+    template <> struct normed<number::gmp::N> {
+        using quad_type = number::gmp::N;
+        using norm_type = number::gmp::N;
+    };
+    
     template <> 
-    struct abs<gmp::N, gmp::N> {
-        gmp::N operator()(const gmp::N& i) {
+    struct abs<number::gmp::N> {
+        number::gmp::N operator()(const number::gmp::N& i) {
             return i;
         }
     };
     
     template <> 
-    struct abs<gmp::N, gmp::Z> {
-        gmp::N operator()(const gmp::Z& i) {
+    struct abs<number::gmp::Z> {
+        number::gmp::N operator()(const number::gmp::Z &i) {
             return i.abs();
-        }
-    };
-    
-    template <> 
-    struct abs<gmp::Z, gmp::Z> {
-        gmp::Z operator()(const gmp::Z& i) {
-            return i.abs();
-        }
-    };
-}
-
-// Declare associativity and commutivity of operators + and * on N. 
-namespace data::math {
-    template <> struct commutative<data::plus<math::number::gmp::N>, math::number::gmp::N> {};
-    template <> struct associative<data::plus<math::number::gmp::N>, math::number::gmp::N> {};
-    template <> struct commutative<data::times<math::number::gmp::N>, math::number::gmp::N> {};
-    template <> struct associative<data::times<math::number::gmp::N>, math::number::gmp::N> {};
-    
-    template <> struct identity<data::plus<math::number::gmp::N>, math::number::gmp::N> {
-        static const math::number::gmp::N value() {
-            return 1;
-        }
-    };
-    
-    template <> struct identity<data::times<math::number::gmp::N>, math::number::gmp::N> {
-        static const math::number::gmp::N value() {
-            return 0;
         }
     };
 }

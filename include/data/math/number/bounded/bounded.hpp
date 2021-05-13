@@ -10,9 +10,8 @@
 #include <data/math/group.hpp>
 #include <data/math/sign.hpp>
 #include <data/encoding/halves.hpp>
-#include <data/math/number/gmp/gmp.hpp>
+#include <data/math/number/gmp/N.hpp>
 #include <data/math/number/bytes/N.hpp>
-#include <data/encoding/words.hpp>
 
 namespace data::math::number {
     
@@ -27,10 +26,7 @@ namespace data::math::number {
         
         bounded() : array(0x00) {}
         
-        bounded(const uint64 x) : array(0x00) {
-            words().set(0, lesser_half(endian::arithmetic<r, false, 8>{x}));
-            words().set(1, greater_half(endian::arithmetic<r, false, 8>{x}));
-        }
+        bounded(const uint64 x);
         
         bounded(const array& b) : array{b} {}
         
@@ -125,11 +121,7 @@ namespace data::math::number {
             throw method::unimplemented{"bounded<size, o, false>{bounded<size, o, true>}"};
         }
         
-        friend struct abs<bounded<false, r, size>, bounded<true, r, size>>;
-        
-        data::arithmetic::words<uint32, r> words() {
-            throw method::unimplemented{"words"};
-        }
+        friend struct abs<bounded<true, r, size>>;
     };
     
     template <endian::order r, size_t size>
@@ -141,10 +133,7 @@ namespace data::math::number {
         
         bounded() : array{0} {}
         
-        bounded(const int64 x) : array(x < 0 ? 0xff : 0x00) {
-            words().set(0, lesser_half(endian::arithmetic<r, true, 8>{x}));
-            words().set(1, greater_half(endian::arithmetic<r, true, 8>{x}));
-        }
+        bounded(const int64 x);
         
         bounded(const array& x) : array{x} {}
         
@@ -238,10 +227,6 @@ namespace data::math::number {
             if (z > Z_bytes<r> {max()} || z < Z_bytes<r> {min()}) throw std::out_of_range{"Z_bytes too big"};
             throw method::unimplemented{"bounded{Z_bytes}"};
         }
-        
-        data::arithmetic::words<int32, r> words() {
-            throw method::unimplemented{"words"};
-        }
     };
     
 }
@@ -250,19 +235,19 @@ namespace data::math::number {
 // as satisfying the expected relations. 
 namespace data::math {
     template <bool is_signed, endian::order r, size_t size> 
-    struct commutative<data::plus<math::number::bounded<is_signed, r, size>>, 
+    struct commutative<plus<math::number::bounded<is_signed, r, size>>, 
         math::number::bounded<is_signed, r, size>> {};
     
     template <bool is_signed, endian::order r, size_t size> 
-    struct associative<data::plus<math::number::bounded<is_signed, r, size>>, 
+    struct associative<plus<math::number::bounded<is_signed, r, size>>, 
         math::number::bounded<is_signed, r, size>> {};
     
     template <bool is_signed, endian::order r, size_t size> 
-    struct commutative<data::times<math::number::bounded<is_signed, r, size>>, 
+    struct commutative<times<math::number::bounded<is_signed, r, size>>, 
         math::number::bounded<is_signed, r, size>> {};
     
     template <bool is_signed, endian::order r, size_t size> 
-    struct associative<data::times<math::number::bounded<is_signed, r, size>>, 
+    struct associative<times<math::number::bounded<is_signed, r, size>>, 
         math::number::bounded<is_signed, r, size>> {};
 }
 

@@ -6,7 +6,6 @@
 
 #include <concepts>
 
-#include <data/meta/equal.hpp>
 #include <data/types.hpp>
 
 namespace data {

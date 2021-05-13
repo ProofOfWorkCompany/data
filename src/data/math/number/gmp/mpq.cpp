@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <data/math/number/gmp/mpq.hpp>
 #include <gmp/gmpxx.h>
+#include <data/math/number/gmp/mpq.hpp>
 
 namespace data {
     

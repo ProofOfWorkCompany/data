@@ -9,7 +9,7 @@
 #include <data/math/number/natural.hpp>
 
 namespace data::encoding {
-    template <typename N>
+    template <math::natural N>
     std::string write_base(const N& n, std::string digits) {
         uint32 base = digits.size();
         if (base < 2) return "";
@@ -33,7 +33,7 @@ namespace data::encoding {
         return o;
     }
     
-    template <typename N, typename f>
+    template <math::natural N, typename f>
     N read_base(string_view s, uint32 base, f inverse_digits) {
         N n{0};
         N pow{1};

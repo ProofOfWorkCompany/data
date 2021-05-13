@@ -8,13 +8,14 @@
 
 #include <ctre.hpp>
 
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <data/types.hpp>
 #include <data/encoding/hex.hpp>
 #include <data/encoding/invalid.hpp>
 #include <data/encoding/endian.hpp>
 #include <data/math/division.hpp>
-#include <boost/algorithm/hex.hpp>
-#include <boost/algorithm/string.hpp>
 
 namespace data::encoding {
     namespace decimal {

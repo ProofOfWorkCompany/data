@@ -2,10 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <data/crypto/AES.hpp>
-#include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
 #include <cryptopp/filters.h>
+#include <cryptopp/aes.h>
+
+#include <data/crypto/AES.hpp>
 
 namespace data::crypto::aes {
     

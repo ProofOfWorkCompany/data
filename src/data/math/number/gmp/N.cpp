@@ -2,8 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <data/data.hpp>
-#include <data/math/number/bytes/Z.hpp>
+#include <data/math/number/gmp/N.hpp>
 #include <data/encoding/digits.hpp>
 
 namespace data::math::number::gmp {
@@ -78,10 +77,10 @@ namespace data::math::number::gmp {
         return encoding::integer::negative(s) ? -Z_read_N_gmp(s.substr(1)) : Z_read_N_gmp(s);
     }
     
-    std::ostream& Z_write_dec(std::ostream& o, const Z& n) {
-        if (n == 0) return o << "0";
-        if (n < 0) return Z_write_dec(o << "-", -n);
-        return o << encoding::write_base<N>(abs<N, Z>{}(n), encoding::decimal::characters());
+    std::ostream& Z_write_dec(std::ostream& o, const Z& z) {
+        if (z == 0) return o << "0";
+        if (z < 0) return Z_write_dec(o << "-", -z);
+        return o << encoding::write_base<N>(data::abs<Z>(z), encoding::decimal::characters());
     }
     
     std::ostream& Z_write_hexidecimal(std::ostream& o, const Z& z) {
@@ -91,17 +90,17 @@ namespace data::math::number::gmp {
         o << "0x";
         if (z > 0) {
             fill = '0';
-            str = encoding::write_base<N>(abs<N, Z>{}(z), encoding::hex::characters_lower());
+            str = encoding::write_base<N>(data::abs<Z>(z), encoding::hex::characters_lower());
             if (str[0] > '7') o << "00";
         } else { 
             fill = 'f';
-            N n = abs<N, Z>{}(z); 
+            N n = data::abs<Z>(z); 
             N pow = 1;
             
             // find the smallest power of 256 bigger than z. 
             while (pow <= n) pow = pow << 8; 
         
-            str = encoding::write_base<N>(abs<N, Z>{}(pow.Value + z), encoding::hex::characters_lower());
+            str = encoding::write_base<N>(data::abs<Z>(pow.Value + z), encoding::hex::characters_lower());
             if (str[0] <= '7') o << "ff";
         } 
         if (str.size() % 2 != 0) o << fill;

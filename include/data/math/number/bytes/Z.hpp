@@ -7,10 +7,10 @@
 
 #include <data/encoding/integer.hpp>
 #include <data/math/number/integer.hpp>
-#include <data/math/number/gmp/gmp.hpp>
+#include <data/math/number/gmp/Z.hpp>
 #include <data/math/division.hpp>
 #include <data/bytestring.hpp>
-#include <data/math/number/abs.hpp>
+#include <data/math/abs.hpp>
 #include <algorithm>
 
 namespace data::math::number {
@@ -20,6 +20,8 @@ namespace data::math::number {
     template <endian::order r>
     struct Z_bytes : protected bytestring<r> {
         friend struct N_bytes<r>;
+        using N = gmp::N;
+        using Z = gmp::Z;
         
         Z_bytes() : bytestring<r>{} {}
         
@@ -172,7 +174,7 @@ namespace data::math::number {
         }
         
         division<Z_bytes> divide(const Z_bytes& z) const {
-            return integer::divide<Z_bytes>(*this, z);
+            return divide_integer<Z_bytes>(*this, z);
         }
         
         bool operator|(const Z_bytes& z) const {
@@ -259,20 +261,6 @@ namespace data::math::number {
         else std::copy(this->begin(), this->begin() + size() - extra_room, ru.begin());
         return ru;
     }
-
-    template <endian::order r> 
-    struct abs<Z_bytes<r>, Z_bytes<r>> {
-        Z_bytes<r> operator()(const Z_bytes<r>& i) {
-            return i.abs();
-        }
-    };
-
-    template <endian::order r> 
-    struct abs<N_bytes<r>, Z_bytes<r>> {
-        N_bytes<r> operator()(const Z_bytes<r>& i) {
-            return i.abs();
-        }
-    };
     
     template <endian::order r>
     bool Z_bytes<r>::operator==(const Z_bytes& z) const {
@@ -310,10 +298,17 @@ namespace data::math::number {
 
 namespace data::math {
     // Declare that the plus and times operation on Z are commutative. 
-    template <endian::order r> struct commutative<data::plus<math::number::Z_bytes<r>>, math::number::Z_bytes<r>> {};
-    template <endian::order r> struct associative<data::plus<math::number::Z_bytes<r>>, math::number::Z_bytes<r>> {};
-    template <endian::order r> struct commutative<data::times<math::number::Z_bytes<r>>, math::number::Z_bytes<r>> {};
-    template <endian::order r> struct associative<data::times<math::number::Z_bytes<r>>, math::number::Z_bytes<r>> {};
+    template <endian::order r> struct commutative<plus<number::Z_bytes<r>>, number::Z_bytes<r>> {};
+    template <endian::order r> struct associative<plus<number::Z_bytes<r>>, number::Z_bytes<r>> {};
+    template <endian::order r> struct commutative<times<number::Z_bytes<r>>, number::Z_bytes<r>> {};
+    template <endian::order r> struct associative<times<number::Z_bytes<r>>, number::Z_bytes<r>> {};
+
+    template <endian::order r> 
+    struct abs<number::Z_bytes<r>> {
+        number::N_bytes<r> operator()(const number::Z_bytes<r>& i) {
+            return i.abs();
+        }
+    };
 }
 
 namespace data::encoding::hexidecimal {

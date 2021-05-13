@@ -3,10 +3,6 @@
 
 namespace data::math::number::gmp {
         
-    N sqrt(const N& n) {
-        return root(n, 2);
-    }
-        
     N root(const N& n, uint32 p) {
         if (p == 0) return N{};
         if (p == 1 || n == N{0} || n == N{1}) return n;

@@ -34,35 +34,11 @@ namespace data {
 }
 
 // Some important math functions. 
-#include <data/math/number/abs.hpp>
+#include <data/math/abs.hpp>
 #include <data/math/number/sqrt.hpp>
 
-namespace data {
-    
-    template <typename X> math::sign 
-    inline sign(const X& x) {
-        return math::number::sign<X>{}(x);
-    }
-
-    template <typename N, typename Z> 
-    inline N abs(const Z& i) {
-        return math::number::abs<N, Z>{}(i);
-    }
-    
-    template <typename X> 
-    inline X arg(const X& x) {
-        return math::number::arg<X>{}(x);
-    }
-    
-    template <typename X, typename N>
-    inline X sqrt(const N& n) {
-        return math::number::sqrt<X, N>{}(n);
-    }
-    
-}
-
 // Natural numbers and integers
-#include <data/math/number/gmp/gmp.hpp>
+#include <data/math/number/gmp/N.hpp>
 #include <data/math/number/extended_euclidian.hpp>
 #include <data/math/number/eratosthenes.hpp>
 #include <data/math/number/gmp/aks.hpp>
@@ -71,7 +47,7 @@ namespace data {
     // we use a wrapper around gmp for natural numbers and integers. 
     
     // Natural numbers
-    using N = math::number::N;
+    using N = math::number::gmp::N;
     
     // Primes
     using prime = math::number::prime<N>;
@@ -87,30 +63,8 @@ namespace data {
     // slow for practical use. 
     using AKS = math::number::AKS<N>;
     
-    // explicit instantiations of functions
-    template math::sign sign<N>(const N&);
-    
-    template N abs<N, N>(const N&);
-    
-    template N arg<N>(const N&);
-    
-    template N sqrt<N, N>(const N&);
-    
-}
-
-namespace data {
-    
     // Integers
-    using Z = math::number::Z;
-    
-    template math::sign sign<Z>(const Z&);
-    
-    template N abs<N, Z>(const Z&);
-    template Z abs<Z, Z>(const Z&);
-    
-    template Z arg<Z>(const Z&);
-    
-    template N sqrt<N, Z>(const Z&);
+    using Z = math::number::gmp::Z;
     
 }
 
@@ -135,15 +89,7 @@ namespace data {
 // rationals
 namespace data {
     
-    using Q = math::number::fraction<Z, N>;
-    
-    template math::sign sign<Q>(const Q&);
-    
-    using QPlus = math::nonnegative<Q>;
-
-    template QPlus abs<QPlus, Q>(const Q&);
-    
-    template Q arg<Q>(const Q&);
+    using Q = math::number::fraction<Z>;
 }
 
 #include <data/math/octonian.hpp>
