@@ -6,7 +6,6 @@
 #define DATA_MATH_NUMBER_BOUNDED
 
 #include <type_traits>
-#include <data/bytestring.hpp>
 #include <data/math/group.hpp>
 #include <data/math/sign.hpp>
 #include <data/encoding/halves.hpp>
@@ -15,16 +14,22 @@
 
 namespace data::math::number {
     
+    template <endian::order, size_t size> struct oriented : byte_array<size> {
+        
+    };
+    
     template <bool is_signed, endian::order, size_t size> struct bounded;
     
     template <endian::order r, size_t size>
-    struct bounded<false, r, size> : bytestring<r, size> {
+    struct bounded<false, r, size> : public byte_array<size> {
         using bit32 = uint32;
         using bit64 = uint64;
         
-        using array = bytestring<r, size>;
+        using array = byte_array<size>;
         
-        bounded() : array(0x00) {}
+        bounded() : array{} {
+            for (byte& b : *this) b = 0x00;
+        }
         
         bounded(const uint64 x);
         
@@ -125,13 +130,15 @@ namespace data::math::number {
     };
     
     template <endian::order r, size_t size>
-    struct bounded<true, r, size> : data::bytestring<r, size> {
+    struct bounded<true, r, size> : byte_array<size> {
         using bit32 = int32;
         using bit64 = int64;
         
-        using array = data::bytestring<r, size>;
+        using array = byte_array<size>;
         
-        bounded() : array{0} {}
+        bounded() : array{} {
+            for (byte& b : *this) b = 0x00;
+        }
         
         bounded(const int64 x);
         

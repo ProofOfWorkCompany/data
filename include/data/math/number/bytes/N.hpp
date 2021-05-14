@@ -11,26 +11,25 @@
 #include <data/tools/linked_stack.hpp>
 
 #include <data/math/number/bytes/Z.hpp>
-#include <data/bytestring.hpp>
 
 namespace data::math::number {
     
     template <endian::order r>
-    struct N_bytes : protected bytestring<r> {
+    struct N_bytes : bytes {
         using N = gmp::N;
         using Z = gmp::Z;
         
-        N_bytes() : bytestring<r>{} {}
+        N_bytes() : bytes{} {}
         
-        N_bytes(const uint64 x) : bytestring<r>(8, 0x00) {
-            *(uint64*)(bytestring<r>::data()) = endian::native<uint64, r>{}.from(x);
+        N_bytes(const uint64 x) : bytes(8, 0x00) {
+            *(uint64*)(bytes::data()) = endian::native<uint64, r>{}.from(x);
         }
         
         static N_bytes read(string_view x) {
             if (x.size() == 0) return 0;
             ptr<bytes> b = encoding::natural::read(x, r);
             if (b == nullptr) return {};
-            return N_bytes<r>{*b};
+            return N_bytes<r>{bytes_view{*b}};
         }
         
         explicit N_bytes(string_view s) : N_bytes{read(s)} {}
@@ -38,9 +37,7 @@ namespace data::math::number {
         // A bit inefficient. 
         explicit N_bytes(const N& n) : N_bytes(data::encoding::hexidecimal::write(n)) {}
         
-        explicit N_bytes(bytes_view b) : bytestring<r>{b} {}
-        
-        using bytestring<r>::operator bytes_view;
+        explicit N_bytes(bytes_view b) : bytes{b} {}
         
         math::sign sign() const {
             return operator==(0) ? math::zero : math::positive;
@@ -56,17 +53,9 @@ namespace data::math::number {
         
     private:
         
-        N_bytes(size_t size, byte fill) : bytestring<r>(size, fill) {}
+        N_bytes(size_t size, byte fill) : bytes(size, fill) {}
         
     public:
-        
-        using bytestring<r>::size;
-        using bytestring<r>::begin;
-        using bytestring<r>::end;
-        using bytestring<r>::rbegin;
-        using bytestring<r>::rend;
-        using bytestring<r>::operator[];
-        using bytestring<r>::valid;
         
         static N_bytes zero(size_t size) {
             return N_bytes(size, 0x00);
@@ -257,7 +246,7 @@ namespace data::math::number {
         explicit N_bytes(const bounded<size, o, false>& b) : N_bytes{bytes_view(b), o} {}
 
     private:
-        N_bytes(bytes_view b, endian::order o) : bytestring<r>{b.size()} {
+        N_bytes(bytes_view b, endian::order o) : bytes{b.size()} {
             std::copy(b.begin(), b.end(), begin());
             if (o != r) std::reverse(begin(), end());
         }

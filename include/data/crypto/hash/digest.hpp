@@ -18,24 +18,12 @@ namespace data::crypto {
         
         digest() : uint<s>() {}
         
-        digest(bytes_view b) : uint<s>{0} {
-            if (b.size() == s) std::copy(b.begin(), b.end(), uint<s>::begin());
-        }
-        
         bool valid() const;
-        
-        digest& operator=(const digest&);
     };
     
     template<size_t s>
     inline bool digest<s>::valid() const {
-        return operator!=(digest{0});
-    }
-    
-    template<size_t s>
-    inline digest<s>& digest<s>::operator=(const digest<s>& d) {
-        uint<s>::operator=(d);
-        return *this;
+        return *this != digest{0};
     }
     
 }

@@ -9,7 +9,7 @@
 #include <data/math/number/integer.hpp>
 #include <data/math/number/gmp/Z.hpp>
 #include <data/math/division.hpp>
-#include <data/bytestring.hpp>
+#include <data/cross.hpp>
 #include <data/math/abs.hpp>
 #include <algorithm>
 
@@ -18,20 +18,20 @@ namespace data::math::number {
     template <endian::order r> struct N_bytes;
     
     template <endian::order r>
-    struct Z_bytes : protected bytestring<r> {
+    struct Z_bytes : bytes {
         friend struct N_bytes<r>;
         using N = gmp::N;
         using Z = gmp::Z;
         
-        Z_bytes() : bytestring<r>{} {}
+        Z_bytes() : bytes{} {}
         
         Z_bytes(const N_bytes<r>&);
         
-        Z_bytes(int64 x) : bytestring<r>(8, x < 0 ? 0xff : 0x00) {
-            *(int64*)(bytestring<r>::data()) = endian::native<int64, r>{}.from(x);
+        Z_bytes(int64 x) : bytes(8, x < 0 ? 0xff : 0x00) {
+            *(int64*)(bytes::data()) = endian::native<int64, r>{}.from(x);
         }
         
-        Z_bytes(const bytestring<r>& x) : bytestring<r>(x) {}
+        Z_bytes(const bytes& x) : bytes(x) {}
         
         // First we write the Z as hex and then read it in again. 
         // A bit inefficient but it's really not that bad. 
@@ -51,19 +51,7 @@ namespace data::math::number {
         
         explicit Z_bytes(string_view s) : Z_bytes{read(s)} {}
         
-        Z_bytes(bytes_view b) : bytestring<r>(b) {}
-        
-        explicit operator bytes_view() const {
-            return bytestring<r>::operator bytes_view();
-        }
-        
-        using bytestring<r>::size;
-        using bytestring<r>::begin;
-        using bytestring<r>::end;
-        using bytestring<r>::rbegin;
-        using bytestring<r>::rend;
-        using bytestring<r>::operator[];
-        using bytestring<r>::valid;
+        Z_bytes(bytes_view b) : bytes(b) {}
         
     private:
         
@@ -77,7 +65,7 @@ namespace data::math::number {
             return true;
         }
         
-        Z_bytes(size_t size, byte fill) : bytestring<r>(size, fill) {}
+        Z_bytes(size_t size, byte fill) : bytes(size, fill) {}
         
     public:
         static Z_bytes zero(size_t size) {

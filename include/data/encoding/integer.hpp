@@ -6,6 +6,11 @@
 #ifndef DATA_ENCODING_INTEGER
 #define DATA_ENCODING_INTEGER
 
+#include <ranges>
+
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <ctre.hpp>
 
 #include <boost/algorithm/hex.hpp>

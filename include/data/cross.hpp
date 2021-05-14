@@ -63,7 +63,21 @@ namespace data {
     
     template <typename X, size_t size> struct array : public cross<X> {
         array() : cross<X>{size} {}
-        array(X fill) : cross<X>{size, fill} {}
+        
+        static array fill(X x) {
+            array n{};
+            for (const X& z : n) z = x;
+            return n;
+        }
+        
+    protected:
+        template <std::incrementable iterator>
+        array(iterator it) : array() {
+            for (X& x : *this) {
+                x = *it; 
+                it++;
+            }
+        }
     };
     
     struct bytes : cross<byte> {
@@ -76,120 +90,28 @@ namespace data {
         }
     };
     
-    // A section is both a container of data and a view of data. 
-    // It allows us to construct data and then show less 
-    // without having to resize. 
-    template <typename X, size_t ...> struct section;
-    
-    template <typename X> struct section<X> : slice<X> {
-        ptr<cross<X>> Data;
+    template <size_t size> struct byte_array : public array<byte, size> {
+        byte_array() : array<byte, size>{} {}
+        byte_array(bytes_view v) : array<byte, size>{v.size() == size ? array<byte, size>{v.begin()} : array<byte, size>{}} {}
+        operator bytes_view() const;
         
-        bool valid() const {
-            return slice<X>::valid() && Data != nullptr;
-        }
+        byte_array operator~() const;
         
-        section() : slice<X>(), Data() {} 
+        byte_array operator<<(int32) const;
+        byte_array operator>>(int32) const;
         
-        section(ptr<cross<X>> d, int begin, int end) : 
-            section(d, d == nullptr ? 
-                slice<X>() : 
-                d->range(range(begin, end))) {}
+        byte_array operator|(const byte_array&) const;
+        byte_array operator&(const byte_array&) const;
         
-        section(const cross<X>& d, int begin, int end) : section(d, range(begin, end) % d.size()) {}
+        bool operator==(const byte_array&) const;
+        bool operator!=(const byte_array&) const;
         
-        section(const cross<X>& d, range r) : 
-            section(r.size() < 0 || r.Begin < 0 || r.End < 0 || r.Begin > d.size() || r.End > d.size() ? 
-                section() :
-                section(std::make_shared<cross<X>>(d), r)) {}
-        
-        section(size_t s, X fill) : section(std::make_shared<cross<X>>(s, fill)) {}
-        
-    private:
-        section(ptr<cross<X>> d, slice<X> s) : slice<X>(s), Data(d) {}
-        section(ptr<cross<X>> d, range r) : slice<X>(d->range(r)), Data(d) {}
-        section(ptr<cross<X>> d) : slice<X>(slice<X>(*d)), Data(d) {}
-    };
-    
-    template <typename X, size_t size> struct section<X, size> : slice<X, size> {
-        ptr<cross<X>> Data;
-        
-        bool valid() const {
-            return slice<X, size>::valid() && Data != nullptr;
-        }
-        
-        section() : slice<X>(), Data() {} 
-        
-        section(ptr<cross<X>> d, size_t begin) : 
-            section(d, d == nullptr || d.size() - begin < size ? 
-                slice<X, size>() : 
-                slice<X, size>(d->data())) {}
-        
-        section(const slice<X, size>);
-        
-        section(X fill) : section(std::make_shared<cross<X>>(size, fill)) {}
-        
-    private:
-        section(ptr<cross<X>> d) : slice<X, size>(d->data()), Data(d) {}
+        operator slice<byte, size>() const;
         
     };
-    
-    template <typename X, endian::order r, size_t ... sizes> struct oriented;
-    
-    template <typename X, size_t ... sizes> struct oriented<X, endian::big, sizes...> : section<X, sizes...> {
-        using section<X, sizes...>::section;
-        
-        constexpr static endian::order endian = endian::big;
-        constexpr static endian::order opposite = endian::little;
-        
-        explicit operator oriented<X, endian::little, sizes...>() const; // TODO
-    };
-    
-    template <typename X, size_t ... sizes> struct oriented<X, endian::little, sizes...> : section<X, sizes...> {
-        using section<X, sizes...>::section;
-        
-        constexpr static endian::order endian = endian::little;
-        constexpr static endian::order opposite = endian::big;
-        
-        explicit operator oriented<X, endian::big, sizes...>() const; // TODO
-        
-    };
-    
-    template <typename X> 
-    oriented<X, endian::little> trim(oriented<X, endian::little>, X fill);
-    
-    template <typename X> 
-    oriented<X, endian::big> trim(oriented<X, endian::big>, X fill);
 
     std::ostream& operator<<(std::ostream& o, const bytes& s);
-
-    template <typename X>
-    inline bool operator==(
-        const oriented<X, endian::big>& a, 
-        const oriented<X, endian::little>& b) {
-        return static_cast<slice<X>>(a) == static_cast<slice<X>>(oriented<X, endian::big>(b));
-    }
-
-    template <typename X>
-    inline bool operator==(
-        const oriented<X, endian::little>& a, 
-        const oriented<X, endian::big>& b) {
-        return static_cast<slice<X>>(a) == static_cast<slice<X>>(oriented<X, endian::little>(b));
-    }
-
-    template <typename X, size_t size>
-    inline bool operator==(
-        const oriented<X, endian::big, size>& a, 
-        const oriented<X, endian::little, size>& b) {
-        return static_cast<slice<X>>(a) == static_cast<slice<X>>(oriented<X, endian::big, size>(b));
-    }
-
-    template <typename X, size_t size>
-    inline bool operator==(
-        const oriented<X, endian::little, size>& a, 
-        const oriented<X, endian::big, size>& b) {
-        return static_cast<slice<X>>(a) == static_cast<slice<X>>(oriented<X, endian::little, size>(b));
-    }
-
+    
     template <typename X>
     inline cross<X>::cross() : std::vector<X>{} {}
     
@@ -200,10 +122,10 @@ namespace data {
     inline cross<X>::cross(size_t size, X fill) : std::vector<X>(size) {
         for (auto it = std::vector<X>::begin(); it < std::vector<X>::end(); it++) *it = fill;
     }
-        
+    
     template <typename X>
     inline cross<X>::cross(std::initializer_list<X> x) : std::vector<X>{x} {}
-        
+    
     template <typename X>
     template<sequence list>
     cross<X>::cross(list l) : cross{} {
@@ -214,7 +136,7 @@ namespace data {
             l = l.rest();
         }
     }
-        
+    
     template <typename X>
     inline cross<X>::operator slice<X>() {
         return slice<X>(static_cast<std::vector<X>&>(*this));

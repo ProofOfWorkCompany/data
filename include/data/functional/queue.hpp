@@ -94,6 +94,18 @@ namespace data {
         return merge_sort(list);
     }
     
+    template <functional::queue L>
+    L shuffle(const L x) {
+        L q = x;
+        L z{};
+        while (!empty(q)) {
+            q = rotate_right(q, std::uniform_int_distribution<int>(0, q.size() - 1)(get_random_engine()));
+            z = z << q.first();
+            q = q.rest();
+        }
+        return z;
+    }
+    
 }
 
 #endif
