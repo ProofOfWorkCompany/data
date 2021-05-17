@@ -9,7 +9,6 @@
 
 #include <data/math/number/natural.hpp>
 #include <data/tools/linked_stack.hpp>
-
 #include <data/math/number/bytes/Z.hpp>
 
 namespace data::math::number {
@@ -22,12 +21,14 @@ namespace data::math::number {
         N_bytes() : bytes{} {}
         
         N_bytes(const uint64 x) : bytes(8, 0x00) {
-            *(uint64*)(bytes::data()) = endian::native<uint64, r>{}.from(x);
+            endian::arithmetic<endian::little, false, 8> num{x};
+            //std::copy(num.begin(), num.end(), words{}.begin(*this));
+            std::copy(num.begin(), num.end(), this->begin()); // TODO should be rbegin for big endian
         }
         
         static N_bytes read(string_view x) {
             if (x.size() == 0) return 0;
-            ptr<bytes> b = encoding::natural::read(x, r);
+            ptr<bytes> b = encoding::natural::read<r>(x);
             if (b == nullptr) return {};
             return N_bytes<r>{bytes_view{*b}};
         }
@@ -54,6 +55,8 @@ namespace data::math::number {
     private:
         
         N_bytes(size_t size, byte fill) : bytes(size, fill) {}
+        
+        using words = ::data::arithmetic::words<N_bytes<r>, r>;
         
     public:
         
@@ -103,7 +106,9 @@ namespace data::math::number {
             return operator<=(N_bytes{n});
         }
         
-        bool operator<=(const N_bytes& n) const;
+        bool operator<=(const N_bytes& n) const {
+            return arithmetic::less_equal(words{}.rend(*this), words{}.rbegin(*this), words{}.rend(n));
+        }
         
         bool operator<=(const Z_bytes<r>& z) const {
             return z.is_negative() ? false : operator<=(N_bytes{z});
@@ -121,7 +126,9 @@ namespace data::math::number {
             return operator>=(N_bytes{n});
         }
         
-        bool operator>=(const N_bytes& n) const;
+        bool operator>=(const N_bytes& n) const {
+            return arithmetic::greater_equal(words{}.rend(*this), words{}.rbegin(*this), words{}.rend(n));
+        }
         
         bool operator>=(const Z_bytes<r>& z) const;
         
@@ -174,7 +181,10 @@ namespace data::math::number {
             return operator=(operator-(n));
         }
         
-        N_bytes operator*(const N_bytes&) const;
+        N_bytes operator*(const N_bytes& n) const {
+            // TODO inefficient
+            return N_bytes{N{*this} * N{n}};
+        }
         
         N_bytes& operator*=(const N_bytes& n) {
             return operator=(operator*(n));
@@ -314,6 +324,7 @@ namespace data::math {
     };
 }
 
+<<<<<<< HEAD
 namespace data::encoding::hexidecimal { 
     
     template <endian::order r>
@@ -321,60 +332,19 @@ namespace data::encoding::hexidecimal {
          return encoding::hexidecimal::write(o, bytes_view(n), r);
     }
     
-    template <endian::order r>
-    std::string write(const math::number::N_bytes<r>& n){
-        std::stringstream s;
-        encoding::hexidecimal::write(s, bytes_view(n), r);
-        return s.str();
-    }
+=======
+namespace data::math {
     
-}
-
-namespace data::encoding::integer {
-    /*
-    template <endian::order r>
-    std::ostream& write(std::ostream& o, const math::number::N_bytes<r>& n) {
-        static const cross<math::number::N_bytes<r>> digits{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        struct to_digit{
-            char operator()(const math::number::N_bytes<r>& n) {
-                if (n == digits[0]) return '0';
-                if (n == digits[1]) return '1';
-                if (n == digits[2]) return '2';
-                if (n == digits[3]) return '3';
-                if (n == digits[4]) return '4';
-                if (n == digits[5]) return '5';
-                if (n == digits[6]) return '6';
-                if (n == digits[7]) return '7';
-                if (n == digits[8]) return '8';
-                if (n == digits[9]) return '9';
-                return '\0';
-            }
-        };
-        
-        functional::stack::linked<char> dig{};
-        math::number::N_bytes<r> x = n;
-        while(x > 0) {
-            math::division<math::number::N_bytes<r>> d = n.divide(10);
-            dig = dig << to_digit{}(d.Remainder);
-            x = d.Quotient;
-        }
-        while(dig.size() > 0) {
-            o << dig.first();
-            dig = dig.rest();
-        }
-        return o;
-    }
-    */
-    template <endian::order r>
-    std::string write(const math::number::N_bytes<r>& n){
-        std::stringstream ss;
-        write(ss, data::math::number::gmp::N{n}); // Inefficient.
-        return ss.str();
-    }
+    // Declare that the plus and times operation on N are commutative. 
+    template <endian::order r> struct commutative<data::plus<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
+    template <endian::order r> struct associative<data::plus<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
+    template <endian::order r> struct commutative<data::times<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
+    template <endian::order r> struct associative<data::times<math::number::N_bytes<r>>, math::number::N_bytes<r>> {};
     
 }
 
 namespace data::math::number {
+>>>>>>> a2453fb... implement bit operations for byte_array.
     template <endian::order r>
     std::ostream& operator<<(std::ostream& o, const N_bytes<r>& n) {
         if (o.flags() & std::ios::hex) return encoding::hexidecimal::write(o, n);
@@ -382,6 +352,52 @@ namespace data::math::number {
         if (o.flags() & std::ios::dec) return encoding::integer::write(o, gmp::N{n});
         return o;
     }
+}
+
+namespace data::encoding::decimal {
+    
+    template <endian::order r> ptr<math::N_bytes<r>> read(string_view s) {
+        if (!valid(s)) return nullptr;
+        
+        ptr<math::N_bytes<r>> n = std::make_shared<math::N_bytes<r>>();
+        
+        for (char x : s) {
+            *n *= 10;
+            *n += digit(x);
+        }
+        
+        return n;
+    }
+    
+    template <typename range> requires const_iterable<range, byte>
+    std::ostream &write(std::ostream& o, range r) {
+        math::N_bytes<endian::little> n{};
+        
+        n.resize(r.end() - r.begin());
+        
+        std::copy(r.begin(), r.end(), n.begin());
+        
+        return o << write_base(n, characters());
+    }
+    
+}
+
+namespace data::encoding::hexidecimal {
+    
+    template <endian::order r> ptr<math::N_bytes<r>> read(string_view s) {
+        if (!valid(s)) return nullptr;
+        
+        ptr<math::N_bytes<r>> n = std::make_shared<math::N_bytes<r>>();
+        n->resize((s.size() - 2) / 2);
+        auto it = s.begin() + 2;
+        while (it != s.end()) {
+            *n = 16 * static_cast<byte>(digit(*it)) + digit(*(it + 1));
+            it += 2;
+        }
+        
+        return n;
+    }
+    
 }
 
 #endif

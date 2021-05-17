@@ -37,7 +37,7 @@ namespace data::encoding {
         EXPECT_EQ(base58::read<N>("KzFvxm6N9qW11MbVoZM8c3tp6UHqf1qrh9EMcHPj74cgBWRmRvBS"), 
             N{"0x805AA786A57B3BFC0DFDF2EC86760339F018114A7E30C2D2701CF294DC60829D9B011CD8E391"});
         
-        EXPECT_EQ(base58::write<N>(base58::read<N>("KzFvxm6N9qW11MbVoZM8c3tp6UHqf1qrh9EMcHPj74cgBWRmRvBS")), 
+        EXPECT_EQ(base58::write<N>(base58::read<N>("KzFvxm6N9qW11MbVoZM8c3tp6UHqf1qrh9EMcHPj74cgBWRmRvBS")),  
             "KzFvxm6N9qW11MbVoZM8c3tp6UHqf1qrh9EMcHPj74cgBWRmRvBS");
     }
     

@@ -44,7 +44,7 @@ namespace data::math::number {
         
         static Z_bytes read(string_view x) {
             if (x == "") return 0; 
-            ptr<bytes> b = encoding::integer::read(x, r);
+            ptr<Z_bytes> b = encoding::integer::read<r>(x);
             if (b == nullptr) throw std::invalid_argument{"invalid integer string provided"};
             return Z_bytes<r>{*b};
         }
@@ -297,36 +297,6 @@ namespace data::math {
             return i.abs();
         }
     };
-}
-
-namespace data::encoding::hexidecimal {
-    
-    template <endian::order r>
-    std::ostream& write(std::ostream& o, const math::number::Z_bytes<r>& n) {
-        return o << "0x" << hex::write(bytes_view(n), r);
-    }
-    
-    template <endian::order r>
-    std::string write(const math::number::Z_bytes<r>& n) {
-        std::stringstream ss;
-        write(ss, n);
-        return ss.str();
-    }
-    
-}
-
-namespace data::encoding::integer {
-    
-    template <endian::order r>
-    std::ostream& write(std::ostream& o, const math::number::Z_bytes<r>& n) {
-        throw method::unimplemented{"decimal::write(Z_bytes)"};
-    }
-    
-    template <endian::order r>
-    std::string write(const math::number::Z_bytes<r>& n){
-        throw method::unimplemented{"decimal::write(Z_bytes)"};
-    }
-    
 }
 
 template <data::endian::order r>

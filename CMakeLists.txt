@@ -138,7 +138,6 @@ ADD_LIBRARY(data STATIC
     src/data/encoding/integer.cpp
     src/data/encoding/utf8.cpp
     src/data/networking/http.cpp
-    src/data/iterable.cpp
     src/data/tools/channel.cpp
     src/data/tools/circular_queue.cpp
     src/data/tools/rate_limiter.cpp

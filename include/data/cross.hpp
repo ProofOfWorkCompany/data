@@ -10,6 +10,7 @@
 #include <data/slice.hpp>
 #include <data/encoding/endian.hpp>
 #include <data/valid.hpp>
+#include <data/math/arithmetic.hpp>
 
 namespace data {
     
@@ -40,9 +41,6 @@ namespace data {
         
         explicit operator slice<X>();
         
-        view<X> range(int) const;
-        view<X> range(int, int) const;
-        
         slice<X> range(int);
         slice<X> range(int, int);
         
@@ -62,7 +60,7 @@ namespace data {
     }
     
     template <typename X, size_t size> struct array : public cross<X> {
-        array() : cross<X>{size} {}
+        array() : cross<X>(size) {}
         
         static array fill(X x) {
             array n{};
@@ -88,6 +86,12 @@ namespace data {
         bytes(bytes_view x) : cross<byte>(x.size()) {
             std::copy(x.begin(), x.end(), cross<byte>::begin());
         }
+        
+        bytes operator~() const {
+            bytes n(size());
+            math::arithmetic::bit_negate(n.end(), n.begin(), this->begin());
+            return n;
+        }
     };
     
     template <size_t size> struct byte_array : public array<byte, size> {
@@ -95,22 +99,41 @@ namespace data {
         byte_array(bytes_view v) : array<byte, size>{v.size() == size ? array<byte, size>{v.begin()} : array<byte, size>{}} {}
         operator bytes_view() const;
         
-        byte_array operator~() const;
+        byte_array operator~() const {
+            byte_array n;
+            math::arithmetic::bit_negate(n.end(), n.begin(), this->begin());
+            return n;
+        }
         
         byte_array operator<<(int32) const;
         byte_array operator>>(int32) const;
         
-        byte_array operator|(const byte_array&) const;
-        byte_array operator&(const byte_array&) const;
+        byte_array operator|(const slice<byte, size> a) const {
+            byte_array n;
+            math::arithmetic::bit_or(n.end(), n.begin(), this->begin(), a.begin());
+            return n;
+        }
         
-        bool operator==(const byte_array&) const;
-        bool operator!=(const byte_array&) const;
+        byte_array operator&(const slice<byte, size> a) const {
+            byte_array n;
+            math::arithmetic::bit_and(n.end(), n.begin(), this->begin(), a.begin());
+            return n;
+        }
         
-        operator slice<byte, size>() const;
+        byte_array operator^(const slice<byte, size> a) const {
+            byte_array n;
+            math::arithmetic::bit_xor(n.end(), n.begin(), this->begin(), a.begin());
+            return n;
+        }
+        
+        operator slice<byte, size>();
         
     };
-
-    std::ostream& operator<<(std::ostream& o, const bytes& s);
+    
+    std::ostream &operator<<(std::ostream &o, const bytes &s);
+    
+    template <size_t size> 
+    std::ostream &operator<<(std::ostream &o, const byte_array<size> &s);
     
     template <typename X>
     inline cross<X>::cross() : std::vector<X>{} {}
@@ -141,16 +164,6 @@ namespace data {
     inline cross<X>::operator slice<X>() {
         return slice<X>(static_cast<std::vector<X>&>(*this));
     }
-    
-    template <typename X>
-    inline view<X> cross<X>::range(int e) const {
-        return operator slice<X>().range(e);
-    }
-    
-    template <typename X>
-    inline view<X> cross<X>::range(int b, int e) const {
-        return operator slice<X>().range(b, e);
-    }
         
     template <typename X>
     inline slice<X> cross<X>::range(int e) {
@@ -166,6 +179,17 @@ namespace data {
     inline slice<X> cross<X>::range(data::range r) {
         return operator slice<X>().range(r);
     }
+    
+    template <size_t size>
+    inline byte_array<size>::operator slice<byte, size>() {
+        return {array<byte, size>::data()};
+    }
+    
+    template <size_t size>
+    inline byte_array<size>::operator bytes_view() const {
+        return {array<byte, size>::data(), size};
+    }
+    
 }
 
 #endif

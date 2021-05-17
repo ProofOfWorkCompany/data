@@ -48,8 +48,18 @@ namespace data::encoding::hex {
         explicit operator bytes() const;
     };
     
-    string write(bytes_view, letter_case = upper);
-    string write(bytes_view, endian::order, letter_case = upper);
+    template <typename range> requires const_iterable<range, byte> 
+    std::ostream &write(std::ostream &o, range r, letter_case q = upper) {
+        return o << write(r, q);
+    }
+    
+    template <typename range> requires const_iterable<range, byte> 
+    string write(range r, letter_case q = upper) {
+        string output((r.end() - r.begin()));
+        if (q == upper) boost::algorithm::hex(r.begin(), r.end(), output.begin());
+        else boost::algorithm::hex_lower(r.begin(), r.end(), output.begin());
+        return output;
+    }
     
     template <size_t n>
     struct fixed : string {
@@ -78,6 +88,18 @@ namespace data::encoding::hex {
         return output;
     }
     
+}
+
+namespace data {
+    
+    std::ostream inline &operator<<(std::ostream &o, const bytes &s) {
+        return o << "\"" << encoding::hex::write(s) << "\""; 
+    }
+    
+    template <size_t size> 
+    std::ostream inline &operator<<(std::ostream &o, const byte_array<size> &s) {
+        return o << "\"" << encoding::hex::write(s) << "\""; 
+    }
 }
 
 #endif
