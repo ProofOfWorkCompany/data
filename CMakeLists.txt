@@ -10,8 +10,8 @@ project(data 	VERSION 1.0
         LANGUAGES CXX)
 
 # Setup paths to outputs of conan's "cmake_find_package" generator
-set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
-set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR} ${CMAKE_PREFIX_PATH})
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
 
 ## Check if GTests is installed. If not, install it
 
@@ -44,63 +44,7 @@ if(NOT TARGET gtest_main AND PACKAGE_TESTS)
 endif()
 
 
-# Include libraries
-
-# Boost settings
-set(Boost_LIB_PREFIX            "lib"       CACHE STRING "")
-set(Boost_USE_MULTITHREADED     ON          CACHE BOOL "") # '-mt' flag
-set(Boost_USE_STATIC_LIBS       ON         CACHE BOOL "")
-set(Boost_USE_STATIC_RUNTIME    OFF         CACHE BOOL "") # '-s' tag
-set(Boost_USE_DEBUG_RUNTIME     OFF         CACHE BOOL "") # '-g' tag
-set(Boost_COMPILER              "-mgw49"    CACHE STRING "")
-
-# Include Boost
-find_package(Boost 1.76.0 COMPONENTS system log log_setup regex REQUIRED)
-
-if(Boost_FOUND)
-
-    message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-    message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-    message(STATUS "Boost_VERSION: ${Boost_VERSION}")
-
-    include_directories(${Boost_INCLUDE_DIRS})
     add_definitions("-DHAS_BOOST")
-
-endif()
-
-
-# Find Crypto++
-find_package(cryptopp REQUIRED)
-if(cryptopp_INCLUDE_DIRS)
-    set(CRYPTOPP_INCLUDE_DIRS ${cryptopp_INCLUDE_DIRS})
-    set(CRYPTOPP_LIBRARIES ${cryptopp_LIBRARIES})
-endif()
-if(CRYPTOPP_INCLUDE_DIRS)
-
-    message(STATUS "Crypto++ INCLUIDE DIRS: ${CRYPTOPP_INCLUDE_DIRS}")
-    MESSAGE(STATUS "Found Crypto++: ${CRYPTOPP_LIBRARIES}")
-    include_directories(${CRYPTOPP_INCLUDE_DIRS})
-endif()
-
-
-#find_package(ICU 60.2 COMPONENTS uc i18n REQUIRED)
-find_package(OpenSSL REQUIRED)
-message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
-message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
-include_directories(${OPENSSL_INCLUDE_DIR})
-
-find_package(PkgConfig REQUIRED)
-#pkg_check_modules(LIBSECP256K1 REQUIRED IMPORTED_TARGET libsecp256k1)
-find_package(SECP256K1 REQUIRED)
-# Find GMP
-find_package(gmp REQUIRED)
-if(gmp_INCLUDE_DIRS)
-    set(GMP_INCLUDE_DIR ${gmp_INCLUDE_DIRS})
-    set(GMP_LIBRARIES ${gmp_LIBRARIES})
-endif()
-if(GMP_INCLUDE_DIR)
-    include_directories(${GMP_INCLUDE_DIR})
-endif()
 
 ## Enable testing
 include(CTest)
@@ -152,8 +96,7 @@ ADD_LIBRARY(data STATIC
 
 target_include_directories(data PUBLIC include)
 
-target_link_libraries(data Boost::regex Boost::system Boost::log Boost::log_setup ${SECP256K1_LIBRARY} ${CRYPTOPP_LIBRARIES} ${GMP_LIBRARY} ${GMPXX_LIBRARY} ${GMP_LIBRARIES} ${OPENSSL_LIBRARIES}
-#PkgConfig::LIBSECP256K1
+target_link_libraries(data CONAN_PKG::boost CONAN_PKG::openssl CONAN_PKG::cryptopp CONAN_PKG::nlohmann_json CONAN_PKG::gmp CONAN_PKG::SECP256K1 CONAN_PKG::uriparser
 )
 get_target_property(OUT data LINK_LIBRARIES)
 message(STATUS ${OUT})

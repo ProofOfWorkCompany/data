@@ -12,9 +12,9 @@ class DataConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
-    generators = "cmake_find_package"
+    generators = "cmake"
     exports_sources = "*"
-    requires = "boost/1.76.0", "openssl/1.1.1k", "cryptopp/8.5.0", "nlohmann_json/3.10.0", "gmp/6.2.1", "SECP256K1/0.1@proofofwork/stable"
+    requires = "boost/1.76.0", "openssl/1.1.1k", "cryptopp/8.5.0", "nlohmann_json/3.10.0", "gmp/6.2.1", "uriparser/0.9.6","SECP256K1/0.1@proofofwork/stable"
 
     def set_version(self):
         if "CIRCLE_TAG" in environ:
