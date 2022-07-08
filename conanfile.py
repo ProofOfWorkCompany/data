@@ -3,7 +3,7 @@ from os import environ
 
 class DataConan(ConanFile):
     name = "data"
-    version = "0.2"
+    version = "0.2.1"
     license = "MIT"
     author = "Daniel Krawisz"
     url = "https://github.com/DanielKrawisz/data"
@@ -20,13 +20,18 @@ class DataConan(ConanFile):
         if "CIRCLE_TAG" in environ:
             self.version = environ.get("CIRCLE_TAG")[1:]
 
+    def configure_cmake(self):
+        cmake = CMake(self)
+        cmake.definitions["PACKAGE_TESTS"] = "Off"
+        cmake.configure()
+        return cmake
+
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
 
     def build(self):
-        cmake = CMake(self)
-        cmake.configure()
+        cmake = self.configure_cmake()
         cmake.build()
 
     def package(self):
